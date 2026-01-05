@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+ 
 import { trackEvent } from "@/lib/analytics";
 
 type Question = {
@@ -650,13 +650,13 @@ const buildReferenceId = () => {
 };
 
 export default function EligibilitePage() {
-  const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [error, setError] = useState("");
   const [phase, setPhase] = useState<"form" | "loading" | "summary">("form");
   const [memo, setMemo] = useState<Memo | null>(null);
   const [loadingIndex, setLoadingIndex] = useState(0);
+  const submittedRef = useRef(false);
 
   const questions = useMemo(() => buildQuestions(answers), [answers]);
   const totalSteps = questions.length;
@@ -704,6 +704,12 @@ export default function EligibilitePage() {
       timeouts.forEach(clearTimeout);
     };
   }, [phase, answers]);
+
+  useEffect(() => {
+    if (phase !== "summary" || !memo || submittedRef.current) return;
+    submittedRef.current = true;
+    submitLead();
+  }, [phase, memo]);
 
   useEffect(() => {
     if (!answers.phoneCountry) {
@@ -756,7 +762,7 @@ export default function EligibilitePage() {
     if (step > 0) setStep((prev) => prev - 1);
   };
 
-  const handleContinue = async () => {
+  const submitLead = async () => {
     const ref = buildReferenceId();
     const score = scoreAnswer(answers);
     const proposals = buildProposal(answers);
@@ -773,18 +779,7 @@ export default function EligibilitePage() {
       // Silent fallback.
     }
 
-    const intent = (answers.intent as string) ?? "";
-    const timing = (answers.horizon as string) ?? (answers.returnHorizon as string) ?? "";
-
-    if (score >= 4) {
-      trackEvent("qualified_routed", { ref, score });
-      router.push(
-        `/whatsapp?ref=${ref}&intent=${encodeURIComponent(intent)}&timing=${encodeURIComponent(timing)}&proposal=${encodeURIComponent(proposalText)}`
-      );
-    } else {
-      trackEvent("nonqualified_routed", { ref, score });
-      router.push(`/orientation?ref=${ref}`);
-    }
+    trackEvent("form_submitted", { ref, score });
   };
 
   const handleAnalyze = () => {
