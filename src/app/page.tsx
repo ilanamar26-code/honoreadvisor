@@ -187,9 +187,9 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="neo-card">
-                    <p className="text-xs font-semibold uppercase text-primary-600">Ancrage</p>
+                    <p className="text-xs font-semibold uppercase text-primary-600">Deux adresses</p>
                     <p className="mt-2 text-sm text-muted">
-                      Équipe locale à Dubaï, équipe 100% francophone.
+                      Un bureau à Paris, un bureau à Dubai.
                     </p>
                     <p className="mt-3 text-xs font-semibold uppercase text-primary-600">
                       Filiale Honoré Patrimoine

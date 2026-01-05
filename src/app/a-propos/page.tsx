@@ -48,7 +48,7 @@ export default function AboutPage() {
                   <img
                     src="/images/ilan-amar.jpg"
                     alt="Ilan Amar"
-                    className="portrait-image"
+                    className="portrait-image portrait-image--bright"
                     loading="lazy"
                   />
                 </div>

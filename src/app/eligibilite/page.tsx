@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  BarChart3,
+  CheckCircle2,
+  ClipboardList,
+  FileText,
+  ShieldAlert,
+  Sparkles
+} from "lucide-react";
  
 import { trackEvent } from "@/lib/analytics";
 
@@ -456,7 +464,7 @@ const buildMemo = (answers: Answers): Memo => {
       ).toLowerCase()})`
     );
     impacts.push(
-      "La détention d’actifs immobiliers en France crée des obligations fiscales continues (revenus, déclarations, conventions) et peut constituer un point de rattachement en matière de résidence."
+      "La détention d’actifs immobiliers en France crée des obligations fiscales continues (revenus, déclarations, conventions) et peut constituer un point de rattachement en matière de résidence. Une gestion non structurée peut exposer à une taxation française maintenue sur ces revenus."
     );
   }
   if (answers.actionnaire === "Oui") {
@@ -464,12 +472,22 @@ const buildMemo = (answers: Answers): Memo => {
     impacts.push(
       "La détention de titres significatifs en France peut déclencher des enjeux d’Exit Tax avant le départ. C’est un point structurant à analyser en amont afin d’éviter des conséquences fiscales non anticipées."
     );
+    if (answers.horizon === "Moins de 3 mois") {
+      impacts.push(
+        "Avec un horizon inférieur à trois mois, la fenêtre de sécurisation est courte. Les démarches liées à la fiscalité de sortie doivent en principe être cadrées en amont (généralement au plus tard 90 jours avant le départ), ce qui implique un point de vigilance urgent."
+      );
+    }
   }
   if (answers.horizon) {
     details.push(`un horizon d’expatriation ${asText(answers.horizon).toLowerCase()}`);
     impacts.push(
       "L’horizon de départ conditionne la séquence des démarches : certaines formalités doivent être réalisées avant le changement de résidence pour sécuriser la position fiscale."
     );
+    if (answers.horizon === "Moins de 3 mois" && answers.actionnaire !== "Oui") {
+      impacts.push(
+        "Un départ inférieur à trois mois impose un cadrage immédiat des points clés (résidence fiscale, flux et obligations déclaratives) afin d’éviter des décisions prises trop tardivement."
+      );
+    }
   }
   if (answers.returnHorizon) {
     details.push(`un horizon de retour ${asText(answers.returnHorizon).toLowerCase()}`);
@@ -499,9 +517,19 @@ const buildMemo = (answers: Answers): Memo => {
   }
   if (answers.investMode) {
     details.push(`un mode d’investissement ${asText(answers.investMode).toLowerCase()}`);
+    if (asText(answers.investMode).includes("société")) {
+      impacts.push(
+        "Un investissement via une structure existante implique de vérifier la conformité des flux (dividendes, management fees, remontées) et l’alignement avec la convention fiscale applicable."
+      );
+    }
   }
   if (answers.investType) {
     details.push(`un investissement orienté ${asText(answers.investType).toLowerCase()}`);
+    if (answers.investType === "Immobilier") {
+      impacts.push(
+        "L’investissement immobilier aux Émirats nécessite de clarifier le régime de détention (personnel vs structure) et les impacts fiscaux de long terme, notamment en cas de retour en France."
+      );
+    }
   }
   if (answers.obligationCountry) {
     details.push(
@@ -510,6 +538,11 @@ const buildMemo = (answers: Answers): Memo => {
     impacts.push(
       "Les obligations déclaratives multi-juridictionnelles nécessitent une coordination rigoureuse afin d’assurer la cohérence des déclarations et d’éviter les incohérences fiscales."
     );
+    if (answers.obligationCountry === "Les deux") {
+      impacts.push(
+        "La coexistence d’obligations en France et aux Émirats impose une lecture consolidée des revenus et des actifs afin d’éviter tout risque de double imposition."
+      );
+    }
   }
   if (answers.obligationType) {
     details.push(
@@ -527,7 +560,7 @@ const buildMemo = (answers: Answers): Memo => {
   const intro =
     "Ce mémoire de cadrage fiscal constitue un premier niveau d’analyse, établi à partir des éléments communiqués via le questionnaire. Il vise à formaliser notre compréhension de votre situation globale et à identifier les enjeux structurants nécessitant un accompagnement professionnel.";
 
-  const situation = `${detailSentence} Cette configuration implique une articulation entre des enjeux personnels, patrimoniaux et fiscaux qui doivent être analysés conjointement.`;
+  const situation = `${detailSentence} Cette configuration dessine un projet à la fois personnel, patrimonial et fiscal, qui impose une lecture globale et cohérente des décisions à venir.`;
 
   let intentionParagraph =
     "Votre intention de principe n’a pas été clairement identifiée, ce qui justifie un cadrage préalable avant toute décision.";
@@ -556,10 +589,10 @@ const buildMemo = (answers: Answers): Memo => {
   }
 
   const impactsParagraph = impacts.length
-    ? `Plusieurs éléments déclarés appellent une vigilance particulière : ${impacts.join(" ")}`
+    ? `Lecture fiscale et points d’attention : ${impacts.join(" ")}`
     : "Plusieurs éléments déclarés appellent une vigilance particulière et nécessitent un examen dédié.";
 
-  const issues = `${intentionParagraph}\n\n${vigilanceParagraph}\n\n${impactsParagraph}`;
+  const issues = `Résumé de situation : ${situation}\n\n${intentionParagraph}\n\n${vigilanceParagraph}\n\n${impactsParagraph}`;
 
   const need =
     "La complexité et l’interdépendance de ces sujets rendent indispensable un accompagnement global, structuré et sécurisé. Une approche fragmentée exposerait la situation à des incohérences ou à des risques évitables. Un pilotage professionnel est requis pour assurer la solidité et la conformité de l’ensemble.";
@@ -567,7 +600,7 @@ const buildMemo = (answers: Answers): Memo => {
   const conclusion =
     "La prochaine étape consiste à poursuivre la consultation avec un fiscaliste du cabinet afin de valider les hypothèses, approfondir les enjeux identifiés et construire une stratégie adaptée à votre situation spécifique.";
 
-  return { intro, situation, issues, need, conclusion };
+  return { intro, situation: "", issues, need, conclusion };
 };
 
 const buildProposal = (answers: Answers) => {
@@ -721,6 +754,27 @@ export default function EligibilitePage() {
     }
   }, [answers.phoneCountry]);
 
+  const validateContact = () => {
+    const firstName = (answers.firstName as string) ?? "";
+    const lastName = (answers.lastName as string) ?? "";
+    const phone = (answers.phone as string) ?? "";
+    const email = (answers.email as string) ?? "";
+
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("Merci de renseigner votre nom et prénom.");
+      return false;
+    }
+    if (!answers.phoneCountry || !phone.trim()) {
+      setError("Merci de renseigner un numéro de téléphone.");
+      return false;
+    }
+    if (!email.trim()) {
+      setError("Merci de renseigner votre adresse email.");
+      return false;
+    }
+    return true;
+  };
+
   const handleNext = () => {
     if (current.type === "radio" && !answers[current.id]) {
       setError("Veuillez sélectionner une option.");
@@ -736,18 +790,7 @@ export default function EligibilitePage() {
     }
 
     if (current.type === "contact") {
-      if (!answers.firstName || !answers.lastName) {
-        setError("Merci de renseigner votre nom et prénom.");
-        return;
-      }
-      if (!answers.phoneCountry || !answers.phone) {
-        setError("Merci de renseigner un numéro de téléphone.");
-        return;
-      }
-      if (!answers.email) {
-        setError("Merci de renseigner votre adresse email.");
-        return;
-      }
+      if (!validateContact()) return;
     }
 
     setError("");
@@ -784,6 +827,9 @@ export default function EligibilitePage() {
 
   const handleAnalyze = () => {
     setError("");
+    if (current.type === "contact" && !validateContact()) {
+      return;
+    }
     setPhase("loading");
     trackEvent("form_submitted");
   };
@@ -818,7 +864,11 @@ export default function EligibilitePage() {
         ) : null}
 
         {phase === "summary" && memo ? (
-          <div>
+          <div className="memo-appear">
+            <div className="memo-badge">
+              <span className="memo-badge-icon">✓</span>
+              Analyse finalisée
+            </div>
             <div className="mb-6 rounded-2xl border border-primary-100 bg-primary-50 px-4 py-3 text-sm font-semibold text-accent-darkBlue">
               L’un de nos fiscalistes va vous rappeler dans les plus brefs délais pour avancer sur votre projet.
             </div>
@@ -851,12 +901,55 @@ export default function EligibilitePage() {
                 </div>
               </div>
 
-              <div className="mt-6 space-y-5 text-sm leading-relaxed text-muted">
-                {[memo.intro, memo.situation, memo.issues, memo.need, memo.conclusion]
-                  .flatMap((block) => block.split("\n\n"))
-                  .map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
+              <div className="mt-6 space-y-6 text-sm leading-relaxed text-muted">
+                {(() => {
+                  const issueParts = memo.issues.split("\n\n");
+                  const situationText = `${memo.intro} ${issueParts[0]?.replace("Résumé de situation : ", "") ?? ""}`.trim();
+                  const analysisText = issueParts.slice(1).join("\n\n").trim();
+                  const supportText = `${memo.need}\n\n${memo.conclusion}`.trim();
+                  const blocks = [
+                    {
+                      title: "Situation du client",
+                      text: situationText,
+                      icon: ClipboardList,
+                      className: "bg-blue-50/70 border-blue-100"
+                    },
+                    {
+                      title: "Analyse fiscale préliminaire",
+                      text: analysisText,
+                      icon: ShieldAlert,
+                      className: "bg-amber-50/70 border-amber-100"
+                    },
+                    {
+                      title: "Accompagnement recommandé",
+                      text: supportText,
+                      icon: CheckCircle2,
+                      className: "bg-emerald-50/70 border-emerald-100"
+                    }
+                  ];
+
+                  return blocks
+                    .filter((block) => block.text.trim())
+                    .map((block) => {
+                      const Icon = block.icon;
+                      return (
+                        <div
+                          key={block.title}
+                          className={`rounded-2xl border px-4 py-4 ${block.className}`}
+                        >
+                          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-600">
+                            <Icon className="h-4 w-4 text-primary-600" />
+                            {block.title}
+                          </div>
+                          {block.text.split("\n\n").map((paragraph) => (
+                            <p key={paragraph} className="mt-2">
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      );
+                    });
+                })()}
               </div>
 
               <div className="mt-8 border-t border-primary-100 pt-4 text-xs text-muted">

@@ -14,13 +14,13 @@ export function SiteFooter() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <span className="flex h-20 w-20 items-center justify-center rounded-3xl border border-primary-100 bg-white shadow-sm">
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary-100 bg-white shadow-sm">
                 <Image
                   src="/logo-mark.png"
                   alt="Honoré Advisor"
-                  width={64}
-                  height={64}
-                  className="h-16 w-16"
+                  width={44}
+                  height={44}
+                  className="h-10 w-10"
                 />
               </span>
               <div className="leading-tight">
