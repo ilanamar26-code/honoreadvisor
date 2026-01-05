@@ -160,7 +160,7 @@ export default function HomePage() {
                 </div>
               </Reveal>
               <Reveal className="grid gap-4" delay={120}>
-                <div className="relative overflow-hidden rounded-[28px] shadow-lg">
+                <div className="relative overflow-hidden rounded-[28px] shadow-lg hover-card">
                   <Image
                     src="/images/consultation.jpg"
                     alt="Consultation stratégique Honoré Advisor"

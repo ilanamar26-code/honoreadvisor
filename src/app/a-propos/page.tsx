@@ -29,7 +29,7 @@ export default function AboutPage() {
                   <img
                     src="/images/roy-masliah.jpg"
                     alt="Roy Masliah"
-                    className="portrait-image"
+                    className="portrait-image portrait-image--bright"
                     loading="lazy"
                   />
                 </div>
