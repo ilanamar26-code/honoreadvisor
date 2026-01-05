@@ -434,9 +434,11 @@ const buildMemo = (answers: Answers): Memo => {
   const intent = answers.intent as string | undefined;
   const details: string[] = [];
   const impacts: string[] = [];
+  const asText = (value?: string | string[]) =>
+    Array.isArray(value) ? value.join(", ") : value ?? "";
 
   if (answers.familySituation) {
-    details.push(`une situation familiale ${answers.familySituation.toLowerCase()}`);
+    details.push(`une situation familiale ${asText(answers.familySituation).toLowerCase()}`);
     if (answers.familySituation === "Marié(e) / en couple avec enfants") {
       impacts.push(
         "La présence d’enfants implique une lecture approfondie du foyer fiscal et des attaches familiales. Cela exige une cohérence stricte entre la situation personnelle, la résidence déclarée et la réalité de vie."
@@ -449,7 +451,9 @@ const buildMemo = (answers: Answers): Memo => {
   }
   if (answers.immobilierFrance && answers.immobilierFrance !== "Non") {
     details.push(
-      `la détention d’un patrimoine immobilier en France (${answers.immobilierFrance.toLowerCase()})`
+      `la détention d’un patrimoine immobilier en France (${asText(
+        answers.immobilierFrance
+      ).toLowerCase()})`
     );
     impacts.push(
       "La détention d’actifs immobiliers en France crée des obligations fiscales continues (revenus, déclarations, conventions) et peut constituer un point de rattachement en matière de résidence."
@@ -462,20 +466,22 @@ const buildMemo = (answers: Answers): Memo => {
     );
   }
   if (answers.horizon) {
-    details.push(`un horizon d’expatriation ${answers.horizon.toLowerCase()}`);
+    details.push(`un horizon d’expatriation ${asText(answers.horizon).toLowerCase()}`);
     impacts.push(
       "L’horizon de départ conditionne la séquence des démarches : certaines formalités doivent être réalisées avant le changement de résidence pour sécuriser la position fiscale."
     );
   }
   if (answers.returnHorizon) {
-    details.push(`un horizon de retour ${answers.returnHorizon.toLowerCase()}`);
+    details.push(`un horizon de retour ${asText(answers.returnHorizon).toLowerCase()}`);
     impacts.push(
       "Le retour en France doit être préparé en amont afin d’anticiper la requalification de la résidence fiscale et la réintégration des revenus dans le cadre français."
     );
   }
   if (answers.currentStatus) {
     details.push(
-      `une situation fiscale actuelle définie comme ${answers.currentStatus.toLowerCase()}`
+      `une situation fiscale actuelle définie comme ${asText(
+        answers.currentStatus
+      ).toLowerCase()}`
     );
     if (answers.currentStatus === "Situation incertaine") {
       impacts.push(
@@ -485,29 +491,33 @@ const buildMemo = (answers: Answers): Memo => {
   }
   if (answers.retourElements) {
     details.push(
-      `la présence d’éléments structurants (${answers.retourElements.toLowerCase()})`
+      `la présence d’éléments structurants (${asText(answers.retourElements).toLowerCase()})`
     );
     impacts.push(
       "Le maintien d’éléments structurants en France implique de sécuriser la cohérence entre l’activité, le patrimoine et la résidence fiscale."
     );
   }
   if (answers.investMode) {
-    details.push(`un mode d’investissement ${answers.investMode.toLowerCase()}`);
+    details.push(`un mode d’investissement ${asText(answers.investMode).toLowerCase()}`);
   }
   if (answers.investType) {
-    details.push(`un investissement orienté ${answers.investType.toLowerCase()}`);
+    details.push(`un investissement orienté ${asText(answers.investType).toLowerCase()}`);
   }
   if (answers.obligationCountry) {
-    details.push(`des obligations déclaratives sur ${answers.obligationCountry.toLowerCase()}`);
+    details.push(
+      `des obligations déclaratives sur ${asText(answers.obligationCountry).toLowerCase()}`
+    );
     impacts.push(
       "Les obligations déclaratives multi-juridictionnelles nécessitent une coordination rigoureuse afin d’assurer la cohérence des déclarations et d’éviter les incohérences fiscales."
     );
   }
   if (answers.obligationType) {
-    details.push(`des déclarations portant sur ${answers.obligationType.toLowerCase()}`);
+    details.push(
+      `des déclarations portant sur ${asText(answers.obligationType).toLowerCase()}`
+    );
   }
   if (answers.otherSituation) {
-    details.push(`une situation décrite comme ${answers.otherSituation.toLowerCase()}`);
+    details.push(`une situation décrite comme ${asText(answers.otherSituation).toLowerCase()}`);
   }
 
   const detailSentence = details.length
