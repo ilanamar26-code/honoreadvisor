@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { buildWhatsAppLink, WHATSAPP_NUMBER } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
 
-export default function WhatsAppPage() {
+function WhatsAppContent() {
   const params = useSearchParams();
   const ref = params.get("ref") ?? "";
   const intent = params.get("intent") ?? "";
@@ -57,5 +57,20 @@ export default function WhatsAppPage() {
         </Link>
       </div>
     </section>
+  );
+}
+
+export default function WhatsAppPage() {
+  return (
+    <Suspense
+      fallback={
+        <section className="mx-auto max-w-3xl px-6 py-16">
+          <h1 className="text-3xl font-semibold text-accent-darkBlue">Confirmation</h1>
+          <p className="mt-4 text-muted">Chargement...</p>
+        </section>
+      }
+    >
+      <WhatsAppContent />
+    </Suspense>
   );
 }
