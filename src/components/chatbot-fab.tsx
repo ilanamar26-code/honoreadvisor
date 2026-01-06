@@ -8,13 +8,13 @@ export function ChatbotFab() {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
       <a
-        aria-label="Démarrer ma consultation"
+        aria-label="Démarrer une consultation fiscale"
         href="/eligibilite"
         onClick={() => trackEvent("click_cta_eligibilite")}
         className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-lg"
       >
         <CalendarCheck className="h-4 w-4" />
-        Démarrer ma consultation
+        Démarrer une consultation fiscale
       </a>
       <a
         aria-label="WhatsApp (question rapide)"

@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  BarChart3,
-  CheckCircle2,
-  ClipboardList,
-  FileText,
-  ShieldAlert,
-  Sparkles
-} from "lucide-react";
+import { BarChart3, CheckCircle2, ClipboardList, ShieldAlert } from "lucide-react";
  
 import { trackEvent } from "@/lib/analytics";
 
@@ -34,6 +27,7 @@ const loadingMessages = [
   "Synthèse en cours",
   "Synthèse prête"
 ];
+
 const countryDialCodes = [
   { code: "AF", dial: "+93" },
   { code: "AL", dial: "+355" },
@@ -297,8 +291,8 @@ const buildQuestions = (answers: Answers): Question[] => {
       options: [
         "Je prépare une expatriation aux Émirats",
         "Je souhaite investir aux Émirats",
-        "Je prépare un retour en France",
-        "Je souhaite être accompagné sur mes obligations ou déclarations fiscales",
+        "Je prépare un retour en France et souhaite comprendre les incidences fiscales",
+        "Je souhaite être accompagné sur mes obligations fiscales françaises",
         "Autre situation"
       ]
     }
@@ -312,7 +306,7 @@ const buildQuestions = (answers: Answers): Question[] => {
         id: "familySituation",
         label: "Quelle est votre situation familiale ?",
         type: "radio",
-        options: ["Célibataire", "Marié(e) / en couple", "Marié(e) / en couple avec enfants"]
+        options: ["Je ne suis pas marié", "Je suis marié", "Je suis marié avec des enfants"]
       },
       {
         id: "immobilierFrance",
@@ -320,14 +314,14 @@ const buildQuestions = (answers: Answers): Question[] => {
         type: "radio",
         options: [
           "Non",
-          "Oui, résidence principale",
-          "Oui, investissement locatif",
-          "Oui, les deux"
+          "Oui je détiens ma résidence principale",
+          "Oui je détiens un investissement locatif",
+          "Oui je détiens ma résidence fiscale et un ou plusieurs investissements locatifs"
         ]
       },
       {
         id: "actionnaire",
-        label: "Êtes-vous actionnaire ou associé de sociétés françaises à plus de 25 % ?",
+        label: "Êtes-vous dirigeant et/ou associé d'une entreprise ?",
         type: "radio",
         options: ["Oui", "Non"]
       },
@@ -335,7 +329,7 @@ const buildQuestions = (answers: Answers): Question[] => {
         id: "horizon",
         label: "À quel horizon envisagez-vous votre expatriation ?",
         type: "radio",
-        options: ["Moins de 3 mois", "Entre 3 et 6 mois", "Entre 6 et 12 mois", "Plus de 12 mois"]
+        options: ["Moins de 3 mois", "Entre 3 et 12 mois", "Plus de 12 mois", "Je vis déjà aux Émirats"]
       }
     );
   }
@@ -421,10 +415,10 @@ const buildQuestions = (answers: Answers): Question[] => {
       label: "Quelle situation se rapproche le plus de la vôtre ?",
       type: "radio",
       options: [
-        "Situation fiscale incertaine",
-        "Plusieurs pays concernés",
-        "Besoin d’un avis global",
-        "Autre cas spécifique"
+        "Je vis actuellement aux Émirats mais je n'ai rien acté auprès de l'administration fiscale",
+        "J'ai de gros doutes sur ma situation fiscale",
+        "Besoin de conseils fiscal en général",
+        "Autre cas"
       ]
     });
   }
@@ -440,26 +434,41 @@ const buildQuestions = (answers: Answers): Question[] => {
 
 const buildMemo = (answers: Answers): Memo => {
   const intent = answers.intent as string | undefined;
-  const details: string[] = [];
+  const clauses: string[] = [];
   const impacts: string[] = [];
   const asText = (value?: string | string[]) =>
     Array.isArray(value) ? value.join(", ") : value ?? "";
+  const joinClauses = (items: string[]) => {
+    if (items.length === 0) return "";
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return `${items[0]} et ${items[1]}`;
+    return `${items.slice(0, -1).join(", ")}, et ${items[items.length - 1]}`;
+  };
 
   if (answers.familySituation) {
-    details.push(`une situation familiale ${asText(answers.familySituation).toLowerCase()}`);
-    if (answers.familySituation === "Marié(e) / en couple avec enfants") {
+    const family = asText(answers.familySituation);
+    if (family === "Je ne suis pas marié") {
+      clauses.push("ne pas être marié");
+    } else if (family === "Je suis marié") {
+      clauses.push("être marié");
+    } else if (family === "Je suis marié avec des enfants") {
+      clauses.push("être marié avec des enfants");
+    } else {
+      clauses.push(`une situation familiale ${family.toLowerCase()}`);
+    }
+    if (answers.familySituation === "Je suis marié avec des enfants") {
       impacts.push(
         "La présence d’enfants implique une lecture approfondie du foyer fiscal et des attaches familiales. Cela exige une cohérence stricte entre la situation personnelle, la résidence déclarée et la réalité de vie."
       );
-    } else if (answers.familySituation === "Marié(e) / en couple") {
+    } else if (answers.familySituation === "Je suis marié") {
       impacts.push(
         "La situation de couple nécessite d’aligner les critères de résidence fiscale et d’éviter tout décalage entre la résidence déclarée et la réalité du foyer."
       );
     }
   }
   if (answers.immobilierFrance && answers.immobilierFrance !== "Non") {
-    details.push(
-      `la détention d’un patrimoine immobilier en France (${asText(
+    clauses.push(
+      `détenir un patrimoine immobilier en France (${asText(
         answers.immobilierFrance
       ).toLowerCase()})`
     );
@@ -468,7 +477,7 @@ const buildMemo = (answers: Answers): Memo => {
     );
   }
   if (answers.actionnaire === "Oui") {
-    details.push("une participation significative dans des sociétés françaises");
+    clauses.push("être dirigeant et/ou associé d’une entreprise");
     impacts.push(
       "La détention de titres significatifs en France peut déclencher des enjeux d’Exit Tax avant le départ. C’est un point structurant à analyser en amont afin d’éviter des conséquences fiscales non anticipées."
     );
@@ -479,7 +488,12 @@ const buildMemo = (answers: Answers): Memo => {
     }
   }
   if (answers.horizon) {
-    details.push(`un horizon d’expatriation ${asText(answers.horizon).toLowerCase()}`);
+    const horizon = asText(answers.horizon);
+    if (horizon === "Je vis déjà aux Émirats") {
+      clauses.push("déjà résider aux Émirats arabes unis");
+    } else {
+      clauses.push(`envisager une expatriation ${horizon.toLowerCase()}`);
+    }
     impacts.push(
       "L’horizon de départ conditionne la séquence des démarches : certaines formalités doivent être réalisées avant le changement de résidence pour sécuriser la position fiscale."
     );
@@ -488,16 +502,21 @@ const buildMemo = (answers: Answers): Memo => {
         "Un départ inférieur à trois mois impose un cadrage immédiat des points clés (résidence fiscale, flux et obligations déclaratives) afin d’éviter des décisions prises trop tardivement."
       );
     }
+    if (answers.horizon === "Je vis déjà aux Émirats") {
+      impacts.push(
+        "Une installation déjà réalisée exige une vérification de la non-résidence fiscale française et de la cohérence des éléments de preuve, afin de sécuriser la situation."
+      );
+    }
   }
   if (answers.returnHorizon) {
-    details.push(`un horizon de retour ${asText(answers.returnHorizon).toLowerCase()}`);
+    clauses.push(`envisager un retour en France ${asText(answers.returnHorizon).toLowerCase()}`);
     impacts.push(
       "Le retour en France doit être préparé en amont afin d’anticiper la requalification de la résidence fiscale et la réintégration des revenus dans le cadre français."
     );
   }
   if (answers.currentStatus) {
-    details.push(
-      `une situation fiscale actuelle définie comme ${asText(
+    clauses.push(
+      `avoir une situation fiscale actuelle définie comme ${asText(
         answers.currentStatus
       ).toLowerCase()}`
     );
@@ -508,15 +527,15 @@ const buildMemo = (answers: Answers): Memo => {
     }
   }
   if (answers.retourElements) {
-    details.push(
-      `la présence d’éléments structurants (${asText(answers.retourElements).toLowerCase()})`
+    clauses.push(
+      `conserver des éléments structurants (${asText(answers.retourElements).toLowerCase()})`
     );
     impacts.push(
       "Le maintien d’éléments structurants en France implique de sécuriser la cohérence entre l’activité, le patrimoine et la résidence fiscale."
     );
   }
   if (answers.investMode) {
-    details.push(`un mode d’investissement ${asText(answers.investMode).toLowerCase()}`);
+    clauses.push(`envisager un investissement ${asText(answers.investMode).toLowerCase()}`);
     if (asText(answers.investMode).includes("société")) {
       impacts.push(
         "Un investissement via une structure existante implique de vérifier la conformité des flux (dividendes, management fees, remontées) et l’alignement avec la convention fiscale applicable."
@@ -524,7 +543,7 @@ const buildMemo = (answers: Answers): Memo => {
     }
   }
   if (answers.investType) {
-    details.push(`un investissement orienté ${asText(answers.investType).toLowerCase()}`);
+    clauses.push(`orienter l’investissement vers ${asText(answers.investType).toLowerCase()}`);
     if (answers.investType === "Immobilier") {
       impacts.push(
         "L’investissement immobilier aux Émirats nécessite de clarifier le régime de détention (personnel vs structure) et les impacts fiscaux de long terme, notamment en cas de retour en France."
@@ -532,8 +551,10 @@ const buildMemo = (answers: Answers): Memo => {
     }
   }
   if (answers.obligationCountry) {
-    details.push(
-      `des obligations déclaratives sur ${asText(answers.obligationCountry).toLowerCase()}`
+    clauses.push(
+      `souhaiter un accompagnement déclaratif sur ${asText(
+        answers.obligationCountry
+      ).toLowerCase()}`
     );
     impacts.push(
       "Les obligations déclaratives multi-juridictionnelles nécessitent une coordination rigoureuse afin d’assurer la cohérence des déclarations et d’éviter les incohérences fiscales."
@@ -545,17 +566,17 @@ const buildMemo = (answers: Answers): Memo => {
     }
   }
   if (answers.obligationType) {
-    details.push(
-      `des déclarations portant sur ${asText(answers.obligationType).toLowerCase()}`
+    clauses.push(
+      `sécuriser des déclarations portant sur ${asText(answers.obligationType).toLowerCase()}`
     );
   }
   if (answers.otherSituation) {
-    details.push(`une situation décrite comme ${asText(answers.otherSituation).toLowerCase()}`);
+    clauses.push(`indiquer ${asText(answers.otherSituation).toLowerCase()}`);
   }
 
-  const detailSentence = details.length
-    ? `Vous nous avez indiqué ${details.join(", ").replace(/, ([^,]*)$/, " et $1")}.`
-    : "Vous nous avez indiqué une situation nécessitant un cadrage préalable avant toute décision.";
+  const detailSentence = clauses.length
+    ? `Vous nous indiquez ${joinClauses(clauses)}.`
+    : "Vous nous indiquez une situation nécessitant un cadrage préalable avant toute décision.";
 
   const intro =
     "Ce mémoire de cadrage fiscal constitue un premier niveau d’analyse, établi à partir des éléments communiqués via le questionnaire. Il vise à formaliser notre compréhension de votre situation globale et à identifier les enjeux structurants nécessitant un accompagnement professionnel.";
@@ -567,32 +588,64 @@ const buildMemo = (answers: Answers): Memo => {
   let vigilanceParagraph =
     "Cette typologie de situation soulève des points de vigilance spécifiques, notamment sur la fiscalité liée aux actifs et revenus de source française, les effets d’un changement de résidence fiscale, la gestion des participations ou fonctions exercées, ainsi que les étapes à sécuriser avant toute modification de statut. Ces éléments requièrent une analyse approfondie et une coordination précise pour garantir la cohérence et la pérennité des choix retenus.";
 
+  let expatContextParagraph = "";
+  let exitTaxParagraph = "";
+  let cabinetParagraph = "";
+  let analysisOverride = "";
+
   if (intent === "Je souhaite investir aux Émirats") {
     intentionParagraph =
       "Votre intention de principe consiste à envisager un investissement aux Émirats arabes unis. Ce type de projet soulève des enjeux fiscaux, patrimoniaux et juridiques significatifs, tant en phase de structuration qu’à moyen et long terme. Les modalités d’investissement doivent impérativement être analysées en amont afin d’éviter des choix sous-optimaux ou fiscalement inefficients.";
     vigilanceParagraph =
       "Il ressort fréquemment que la détention des fonds au sein d’une holding ne conduit pas nécessairement à un investissement via cette même structure. Une analyse préalable est indispensable afin de déterminer le schéma le plus efficient, en tenant compte de la fiscalité de sortie, des conventions internationales et des objectifs patrimoniaux globaux. L’étude doit intervenir avant toute décision opérationnelle.";
+    analysisOverride =
+      "Un investissement immobilier aux Émirats doit être structuré en cohérence avec la stratégie patrimoniale globale de l’investisseur.\nLe choix entre une acquisition à titre personnel ou via une structure sociétaire n’est jamais neutre et produit des effets différents en matière de fiscalité, de financement, de gestion et de sortie.\n\nDans certaines situations, une acquisition en direct peut présenter un intérêt, notamment lorsqu’elle permet d’augmenter le revenu brut global et, selon la configuration du dossier, de mobiliser des mécanismes de crédits d’impôt liés aux loyers futurs. À l’inverse, lorsque le projet porte sur l’acquisition de plusieurs actifs, une logique d’arbitrage régulière ou des opérations de revente rapide (flipping), une structuration via une holding peut s’avérer plus adaptée afin de sécuriser l’exploitation, la fiscalité et la circulation des flux.\n\nCes choix ne peuvent toutefois être standardisés. Ils dépendent du nombre de biens envisagés, de l’horizon de détention, du mode d’exploitation, de la situation fiscale globale de l’investisseur et des objectifs poursuivis à moyen et long terme. L’enjeu n’est pas de reproduire un schéma prédéfini, mais de construire une structuration sur mesure, cohérente et durable, alignée avec la réalité du projet.";
   } else if (intent === "Je prépare une expatriation aux Émirats") {
-    intentionParagraph =
-      "Votre intention de principe consiste à préparer une expatriation aux Émirats arabes unis. Ce projet implique de sécuriser la résidence fiscale, les liens conservés en France et la structuration des actifs avant le départ, afin d’assurer la cohérence globale de la situation.";
-    vigilanceParagraph =
-      "La résidence fiscale repose notamment sur trois critères majeurs : le foyer et le lieu de séjour principal, le centre des intérêts économiques et l’activité professionnelle. L’absence de cohérence entre ces critères et la réalité vécue expose à un risque de remise en cause de la non‑résidence. Il est essentiel de documenter et de sécuriser ces éléments avant l’expatriation.";
-  } else if (intent === "Je prépare un retour en France") {
+    expatContextParagraph =
+      "Outre le fait que la fiscalité aux émirats peut sembler très attrayante, la convention fiscale signée entre la France et les Émirats présente des avantages particulièrement significatifs sur de nombreux points, notamment : l’absence d’impôt et de charges sociales sur les rémunérations perçues aux Émirats, l’absence d’imposition sur les dividendes versés par une société française à un résident fiscal des Émirats, l’absence d’impôt sur les donation et succession du patrimoine situé hors de France.\n\nToutefois, pour pouvoir bénéficier pleinement de ces avantages, il est indispensable d’être effectivement résident fiscal des Émirats arabes unis. À cet égard, il convient de souligner qu’il ne suffit pas de s’installer ou de vivre aux Émirats pour que l’administration fiscale française vous considère automatiquement comme non-résident de France.\n\nC’est précisément pour cette raison qu’il est primordial de structurer rigoureusement votre départ de France, afin de pouvoir à la fois revendiquer une résidence fiscale aux Émirats et, surtout, être reconnu par l’administration fiscale française comme non-résident, en sécurisant durablement ce statut et les critères majeurs qui le définissent (foyer d’habitation centre des intérêts vitaux, lieu de séjour, lieu d’exercice de l’activité professionnel…)\nL’enjeu est majeur : les contrôles et remises en cause du statut de non-résident se multiplient depuis plusieurs mois, exposant les contribuables insuffisamment préparés à des redressements lourds et à des conséquences fiscales significatives.\n\nEn résumé, pour pouvoir bénéficier pleinement du régime fiscal applicable aux Émirats arabes unis, il est indispensable de structurer rigoureusement votre départ de France afin de : sécuriser, de la manière la plus robuste possible, votre statut de non-résident fiscal français, conformément aux dispositions de la convention fiscale franco-émirienne; d’établir de façon incontestable votre résidence fiscale aux Émirats arabes unis, condition essentielle pour tirer pleinement profit des mécanismes de la convention fiscale et éviter toute remise en cause par l’administration fiscale française ; d’anticiper et préparer l’ensemble des obligations déclaratives liées au régime de l’Exit Tax si vous en êtes tenu.";
+    if (answers.actionnaire === "Oui") {
+      exitTaxParagraph =
+        "Par ailleurs, compte tenu de votre qualité d’associé d’une société française, vous serez très probablement soumis aux obligations déclaratives liées au régime de l’Exit Tax.\nCe dispositif impose de déclarer à l’administration fiscale française l’ensemble des plus-values latentes afférentes aux titres que vous détenez. Fort heureusement, le mécanisme du sursis de paiement conduit, dans plus de 99 % des situations, à une absence totale de conséquences fiscales immédiates : l’Exit Tax demeure alors une obligation purement déclarative.";
+      exitTaxParagraph +=
+        "\nEn revanche, il est essentiel d’être particulièrement vigilant : le non-respect des délais déclaratifs entraîne la perte automatique du sursis de paiement et permet à l’administration fiscale de procéder à une imposition immédiate des plus-values latentes, au taux de la flat tax, sans possibilité de régularisation ultérieure.";
+    }
+    analysisOverride = [expatContextParagraph, exitTaxParagraph]
+      .filter((paragraph) => paragraph.trim())
+      .join("\n\n");
+  } else if (intent === "Je prépare un retour en France et souhaite comprendre les incidences fiscales") {
     intentionParagraph =
       "Votre intention de principe consiste à préparer un retour en France. Ce type de trajectoire nécessite d’anticiper les effets fiscaux du changement de résidence et d’aligner les actifs, revenus et structures avec le futur cadre français.";
-  } else if (intent === "Je souhaite être accompagné sur mes obligations ou déclarations fiscales") {
+    analysisOverride =
+      "Un retour en France doit être préparé en amont afin d’en maîtriser pleinement les incidences fiscales et patrimoniales.\nLe changement de résidence fiscale entraîne des effets immédiats sur l’imposition des revenus, du patrimoine, des structures détenues et des flux internationaux.\n\nL’analyse fiscale préliminaire vise à établir un diagnostic global de la situation, en tenant compte de la date de retour envisagée, de la composition des revenus, des actifs détenus en France et à l’étranger, ainsi que des structures existantes. Elle permet d’identifier les zones de risque, les points de vigilance et les arbitrages à effectuer avant la reprise de la résidence fiscale française.\n\nCette phase est essentielle pour anticiper les impacts fiscaux, éviter les requalifications ou doubles impositions et définir les ajustements nécessaires afin d’aborder le retour dans un cadre sécurisé, cohérent et conforme aux exigences de l’administration fiscale française.";
+  } else if (intent === "Je souhaite être accompagné sur mes obligations fiscales françaises") {
     intentionParagraph =
       "Votre intention de principe consiste à sécuriser vos obligations ou déclarations fiscales. Cette démarche requiert une analyse structurée afin de garantir la conformité des positions prises et la cohérence des déclarations entre les juridictions concernées.";
+    analysisOverride =
+      "Le respect des obligations fiscales françaises nécessite un suivi rigoureux et conforme aux exigences de l’administration.\nDéclarations de revenus, obligations déclaratives liées aux comptes, sociétés ou actifs détenus à l’étranger, suivi des conventions fiscales : ces obligations ne peuvent être traitées de manière approximative.\n\nLe cabinet Honoré accompagne ses clients dans la gestion et la sécurisation de leurs obligations fiscales françaises, en veillant à la cohérence des déclarations, à la conformité des informations transmises et à la maîtrise des risques de redressement.\n\nCet accompagnement permet de traiter les obligations fiscales de manière structurée, sécurisée et continue, sans exposer inutilement le client à des zones d’incertitude ou de non-conformité.";
   } else if (intent === "Autre situation") {
     intentionParagraph =
       "Votre intention de principe concerne une situation atypique ou multi-juridictionnelle. Ce type de configuration exige un cadrage global préalable afin d’identifier les risques et les priorités de traitement.";
+    const situation = asText(answers.otherSituation);
+    const introLine = situation
+      ? `Vous avez indiqué : ${situation.toLowerCase()}.`
+      : "Vous avez indiqué une situation particulière nécessitant un cadrage précis.";
+    analysisOverride =
+      `${introLine}\n\n` +
+      "Nous allons vous recontacter dans les plus brefs délais afin de reprendre votre situation de manière structurée et définir le cadre d’analyse le plus adapté.";
   }
 
   const impactsParagraph = impacts.length
     ? `Lecture fiscale et points d’attention : ${impacts.join(" ")}`
     : "Plusieurs éléments déclarés appellent une vigilance particulière et nécessitent un examen dédié.";
 
-  const issues = `Résumé de situation : ${situation}\n\n${intentionParagraph}\n\n${vigilanceParagraph}\n\n${impactsParagraph}`;
+  const issues = [
+    `Résumé de situation : ${situation}`,
+    analysisOverride || intentionParagraph,
+    analysisOverride ? "" : vigilanceParagraph,
+    analysisOverride ? "" : impactsParagraph
+  ]
+    .filter((paragraph) => paragraph.trim())
+    .join("\n\n");
 
   const need =
     "La complexité et l’interdépendance de ces sujets rendent indispensable un accompagnement global, structuré et sécurisé. Une approche fragmentée exposerait la situation à des incohérences ou à des risques évitables. Un pilotage professionnel est requis pour assurer la solidité et la conformité de l’ensemble.";
@@ -622,14 +675,14 @@ const buildProposal = (answers: Answers) => {
     );
   }
 
-  if (intent === "Je prépare un retour en France") {
+  if (intent === "Je prépare un retour en France et souhaite comprendre les incidences fiscales") {
     proposals.push(
       "Audit de la situation avant retour",
       "Plan d’alignement fiscal et patrimonial"
     );
   }
 
-  if (intent === "Je souhaite être accompagné sur mes obligations ou déclarations fiscales") {
+  if (intent === "Je souhaite être accompagné sur mes obligations fiscales françaises") {
     proposals.push(
       "Sécurisation déclarative France/Émirats",
       "Documentation et cadrage des risques"
@@ -649,7 +702,8 @@ const scoreAnswer = (answers: Answers) => {
 
   if (intent === "Je prépare une expatriation aux Émirats") {
     score += 2;
-    if (["Moins de 3 mois", "Entre 3 et 6 mois"].includes(answers.horizon as string)) score += 2;
+    if (["Moins de 3 mois", "Entre 3 et 12 mois"].includes(answers.horizon as string)) score += 2;
+    if (answers.horizon === "Je vis déjà aux Émirats") score += 1;
     if (answers.actionnaire === "Oui") score += 2;
   }
 
@@ -658,12 +712,12 @@ const scoreAnswer = (answers: Answers) => {
     if (answers.investType === "Les deux") score += 1;
   }
 
-  if (intent === "Je prépare un retour en France") {
+  if (intent === "Je prépare un retour en France et souhaite comprendre les incidences fiscales") {
     score += 2;
     if (answers.currentStatus === "Situation incertaine") score += 1;
   }
 
-  if (intent === "Je souhaite être accompagné sur mes obligations ou déclarations fiscales") {
+  if (intent === "Je souhaite être accompagné sur mes obligations fiscales françaises") {
     score += 2;
     if (answers.obligationType === "Plusieurs sujets") score += 1;
   }
@@ -744,16 +798,6 @@ export default function EligibilitePage() {
     submitLead();
   }, [phase, memo]);
 
-  useEffect(() => {
-    if (!answers.phoneCountry) {
-      setAnswers((prev) => ({
-        ...prev,
-        phoneCountry: "+33",
-        phone: prev.phone ? prev.phone : "+33 "
-      }));
-    }
-  }, [answers.phoneCountry]);
-
   const validateContact = () => {
     const firstName = (answers.firstName as string) ?? "";
     const lastName = (answers.lastName as string) ?? "";
@@ -764,7 +808,7 @@ export default function EligibilitePage() {
       setError("Merci de renseigner votre nom et prénom.");
       return false;
     }
-    if (!answers.phoneCountry || !phone.trim()) {
+    if (!phone.trim()) {
       setError("Merci de renseigner un numéro de téléphone.");
       return false;
     }
@@ -838,7 +882,7 @@ export default function EligibilitePage() {
     <section className="mx-auto max-w-3xl px-6 py-16">
       <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary-600">Accompagnement</p>
       <h1 className="mt-4 text-3xl font-semibold text-accent-darkBlue sm:text-4xl">
-        Démarrer ma consultation
+        Démarrer une consultation fiscale
       </h1>
       <p className="mt-4 text-muted">{totalSteps} questions</p>
 
@@ -865,51 +909,53 @@ export default function EligibilitePage() {
 
         {phase === "summary" && memo ? (
           <div className="memo-appear">
-            <div className="memo-badge">
-              <span className="memo-badge-icon">✓</span>
-              Analyse finalisée
-            </div>
-            <div className="mb-6 rounded-2xl border border-primary-100 bg-primary-50 px-4 py-3 text-sm font-semibold text-accent-darkBlue">
-              L’un de nos fiscalistes va vous rappeler dans les plus brefs délais pour avancer sur votre projet.
-            </div>
-            <div className="rounded-3xl border border-primary-100 bg-white/80 p-6 shadow-soft">
-              <div className="border-b border-primary-100 pb-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center">
-                    <img src="/logo.png" alt="Honoré Patrimoine" className="h-28 w-auto sm:h-32" />
-                  </div>
-                  <div className="text-xs text-muted sm:text-right">
-                    <p>
-                      Nom & prénom :{" "}
+            <div className="rounded-3xl border border-primary-100 bg-white/80 p-4 shadow-soft">
+              <div className="memo-badge">
+                <span className="memo-badge-icon">✓</span>
+                Analyse finalisée
+              </div>
+              <div className="border-b border-primary-100 pb-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="text-xs text-muted">
+                    <p className="text-sm font-semibold text-accent-darkBlue">
                       {`${answers.firstName ?? ""} ${answers.lastName ?? ""}`.trim() ||
                         "Client Honoré Advisor"}
                     </p>
-                  <p>Téléphone : {answers.phone ?? "-"}</p>
+                    <p>Téléphone : {answers.phone ?? "-"}</p>
                     <p>Email : {answers.email ?? "-"}</p>
                     <p>Date : {new Intl.DateTimeFormat("fr-FR").format(new Date())}</p>
-                    <p>Objet : Cadrage préliminaire de votre situation fiscale et patrimoniale</p>
+                  </div>
+                  <div className="flex items-center justify-start sm:justify-end">
+                    <img src="/logo.png" alt="Honoré Patrimoine" className="h-48 w-auto sm:h-56" />
                   </div>
                 </div>
-                <div className="mt-4 text-center">
-                  <p className="text-xs font-semibold text-accent-darkBlue">Honoré Patrimoine</p>
-                  <p className="mt-1 text-base font-semibold uppercase tracking-[0.2em] text-primary-600">
-                    Mémoire de cadrage fiscal
+                <div className="mt-1 text-left">
+                  <p className="text-base font-semibold uppercase tracking-[0.08em] text-primary-600">
+                    Objet : Synthèse fiscale préliminaire
                   </p>
-                  <p className="text-sm font-semibold text-accent-darkBlue">
-                    Synthèse préliminaire
+                  <p className="mt-1 text-sm italic text-muted">
+                    Cette synthèse fiscale préliminaire a pour unique objet de vous présenter les
+                    principaux enjeux fiscaux de votre projet, en attirant votre attention sur les
+                    points de vigilance indispensables afin de réussir et sécuriser fiscalement
+                    votre expatriation vers les Émirats arabes unis.
                   </p>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-6 text-sm leading-relaxed text-muted">
+              <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted">
                 {(() => {
                   const issueParts = memo.issues.split("\n\n");
-                  const situationText = `${memo.intro} ${issueParts[0]?.replace("Résumé de situation : ", "") ?? ""}`.trim();
+                  const situationText = `${issueParts[0]?.replace("Résumé de situation : ", "") ?? ""}`.trim();
                   const analysisText = issueParts.slice(1).join("\n\n").trim();
-                  const supportText = `${memo.need}\n\n${memo.conclusion}`.trim();
+                  const expatSupport =
+                    "Préparer une expatriation fiscalement sécurisée vers les Émirats suppose une approche rigoureuse, une parfaite maîtrise des critères de résidence fiscale et une connaissance opérationnelle des pratiques de l’administration fiscale française.\nDans ce contexte, le cabinet Honoré intervient de manière permanente sur des dossiers d’expatriation vers les Émirats.\nCette expérience, acquise au travers de plusieurs centaines de situations d’expatriation traitées, combinée à une présence opérationnelle à la fois en France et aux Émirats arabes unis, permet d’aborder ces dossiers avec une vision globale, pragmatique et conforme aux exigences des deux administrations fiscales.";
+                  const supportText =
+                    answers.intent === "Je prépare une expatriation aux Émirats"
+                      ? expatSupport
+                      : `${memo.need}\n\n${memo.conclusion}`.trim();
                   const blocks = [
                     {
-                      title: "Situation du client",
+                      title: "Votre situation",
                       text: situationText,
                       icon: ClipboardList,
                       className: "bg-blue-50/70 border-blue-100"
@@ -918,7 +964,8 @@ export default function EligibilitePage() {
                       title: "Analyse fiscale préliminaire",
                       text: analysisText,
                       icon: ShieldAlert,
-                      className: "bg-amber-50/70 border-amber-100"
+                      className: "bg-amber-50/70 border-amber-100",
+                      list: true
                     },
                     {
                       title: "Accompagnement recommandé",
@@ -941,7 +988,38 @@ export default function EligibilitePage() {
                             <Icon className="h-4 w-4 text-primary-600" />
                             {block.title}
                           </div>
-                          {block.text.split("\n\n").map((paragraph) => (
+                      {block.list
+                        ? (() => {
+                            const lines = block.text.split("\n");
+                            const paragraphs: string[] = [];
+                            const bullets: string[] = [];
+                            lines.forEach((line) => {
+                              const trimmed = line.trim();
+                              if (!trimmed) return;
+                              if (trimmed.startsWith("•")) {
+                                bullets.push(trimmed.replace(/^•\s*/, ""));
+                              } else {
+                                paragraphs.push(trimmed);
+                              }
+                            });
+                            return (
+                              <>
+                                {paragraphs.map((paragraph) => (
+                                  <p key={paragraph} className="mt-2">
+                                    {paragraph}
+                                  </p>
+                                ))}
+                                {bullets.length ? (
+                                  <ul className="memo-bullets mt-4 list-disc space-y-1 pl-5">
+                                    {bullets.map((bullet) => (
+                                      <li key={bullet}>{bullet}</li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </>
+                            );
+                          })()
+                        : block.text.split("\n\n").map((paragraph) => (
                             <p key={paragraph} className="mt-2">
                               {paragraph}
                             </p>
@@ -955,6 +1033,19 @@ export default function EligibilitePage() {
               <div className="mt-8 border-t border-primary-100 pt-4 text-xs text-muted">
                 <p>Signature : Roy Masliah – Fiscaliste</p>
                 <p>Cabinet Honoré Patrimoine</p>
+              </div>
+            </div>
+            <div className="mt-6 rounded-2xl border border-primary-200 bg-gradient-to-r from-primary-50 via-white to-primary-50 px-5 py-4 text-base font-semibold text-accent-darkBlue shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-white shadow-sm">
+                  <span className="relative flex h-4 w-4 items-center justify-center">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/40" />
+                    <span className="relative text-base">✓</span>
+                  </span>
+                </div>
+                <p className="leading-relaxed">
+                  Cette synthèse vient de vous être envoyée par email et l’un de nos fiscalistes va vous rappeler dans les plus brefs délais pour avancer sur votre projet.
+                </p>
               </div>
             </div>
           </div>
@@ -1038,39 +1129,15 @@ export default function EligibilitePage() {
                       className="rounded-2xl border border-primary-100 bg-white px-4 py-3 text-sm text-muted"
                     />
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-[140px_1fr]">
-                    <select
-                      value={(answers.phoneCountry as string) ?? ""}
-                      onChange={(event) => {
-                        const nextCode = event.target.value;
-                        setAnswers((prev) => {
-                          const currentPhone = (prev.phone as string) ?? "";
-                          const normalized = currentPhone.replace(/^\+\d[\d-]*\s?/, "");
-                          return {
-                            ...prev,
-                            phoneCountry: nextCode,
-                            phone: nextCode ? `${nextCode} ${normalized}`.trim() : normalized
-                          };
-                        });
-                      }}
-                      className="rounded-2xl border border-primary-100 bg-white px-4 py-3 text-sm text-muted"
-                    >
-                      {sortedDialCodes.map((item) => (
-                        <option key={`${item.code}-${item.dial}`} value={item.dial}>
-                          {getFlagEmoji(item.code)} {item.code} {item.dial}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="tel"
-                      placeholder="Numéro de téléphone"
-                      value={(answers.phone as string) ?? ""}
-                      onChange={(event) =>
-                        setAnswers((prev) => ({ ...prev, phone: event.target.value }))
-                      }
-                      className="rounded-2xl border border-primary-100 bg-white px-4 py-3 text-sm text-muted"
-                    />
-                  </div>
+                  <input
+                    type="tel"
+                    placeholder="Numéro de téléphone"
+                    value={(answers.phone as string) ?? ""}
+                    onChange={(event) =>
+                      setAnswers((prev) => ({ ...prev, phone: event.target.value }))
+                    }
+                    className="rounded-2xl border border-primary-100 bg-white px-4 py-3 text-sm text-muted"
+                  />
                   <input
                     type="email"
                     placeholder="Adresse email"

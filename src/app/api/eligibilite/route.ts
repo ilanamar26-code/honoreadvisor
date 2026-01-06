@@ -52,11 +52,8 @@ export async function POST(req: Request) {
       const lastName = (answers.lastName as string) ?? "";
       const fullName = `${firstName} ${lastName}`.trim() || "Lead HonorAdvisor";
       const email = (answers.email as string) ?? "";
-      const phoneCountry = (answers.phoneCountry as string) ?? "";
       const phone = (answers.phone as string) ?? "";
-      const phoneValue = phone.startsWith("+")
-        ? phone
-        : `${phoneCountry} ${phone}`.trim();
+      const phoneValue = phone;
 
       const personRes = await fetch(`${baseUrl}/persons?api_token=${token}`, {
         method: "POST",

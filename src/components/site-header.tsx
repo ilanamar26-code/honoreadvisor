@@ -39,7 +39,7 @@ export function SiteHeader() {
             onClick={() => trackEvent("click_cta_eligibilite")}
             className="rounded-full bg-primary-600 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-white"
           >
-            Démarrer ma consultation
+            Démarrer une consultation fiscale
           </Link>
         </nav>
 
@@ -73,7 +73,7 @@ export function SiteHeader() {
                 setOpen(false);
               }}
             >
-              Démarrer ma consultation
+              Démarrer une consultation fiscale
             </Link>
           </div>
         </div>

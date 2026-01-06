@@ -28,7 +28,7 @@ export default function CalculatorsPage() {
           href="/eligibilite"
           className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white"
         >
-          Démarrer ma consultation
+          Démarrer une consultation fiscale
         </Link>
       </div>
     </SectionShell>

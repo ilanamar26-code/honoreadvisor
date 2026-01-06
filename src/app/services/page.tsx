@@ -37,7 +37,7 @@ export default function ServicesPage() {
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <Link href="/eligibilite" className="neo-button neo-button-purple">
-                Démarrer ma consultation
+                Démarrer une consultation fiscale
               </Link>
               <Link href="/methode" className="text-sm font-semibold text-primary-600">
                 Voir la méthode <span aria-hidden="true">→</span>

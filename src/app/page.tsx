@@ -143,7 +143,7 @@ export default function HomePage() {
                   Présence opérationnelle à Dubaï depuis +5 ans.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  {["Accompagnement sur mesure", "Dossiers complexes"].map((item) => (
+                  {["Expatriation", "Exit Tax", "Résidence fiscale"].map((item) => (
                     <span key={item} className="hero-tag">
                       {item}
                     </span>
@@ -154,7 +154,7 @@ export default function HomePage() {
                     href="/eligibilite"
                     className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-glow button-sheen"
                   >
-                    Démarrer ma consultation
+                    Démarrer une consultation fiscale
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -183,20 +183,36 @@ export default function HomePage() {
                       className="h-52 w-full object-cover object-center"
                     />
                     <div className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold text-accent-darkBlue">
-                      Basé à Dubaï
+                      Basé à Paris et à Dubai
                     </div>
                   </div>
                   <div className="neo-card">
-                    <p className="text-xs font-semibold uppercase text-primary-600">Deux adresses</p>
+                    <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Dubai</p>
                     <p className="mt-2 text-sm text-muted">
-                      Un bureau à Paris, un bureau à Dubai.
+                      Al Fattan Downton, Dubai
                     </p>
-                    <p className="mt-3 text-xs font-semibold uppercase text-primary-600">
-                      Filiale Honoré Patrimoine
+                    <a
+                      href="https://maps.app.goo.gl/fbyVKcPXPaSJgzki7"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-2 text-xs text-primary-600"
+                    >
+                      voir sur la carte <span aria-hidden="true">→</span>
+                    </a>
+                    <p className="mt-4 text-xs font-semibold uppercase text-primary-600">
+                      Bureau de Paris
                     </p>
                     <p className="mt-1 text-sm text-muted">
-                      15+ ans d'expertise en France et +5 ans aux Emirats.
+                      54 avenue Marceau 75008 Paris
                     </p>
+                    <a
+                      href="https://maps.app.goo.gl/z7VFQTSuK9F9GR917"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-2 text-xs text-primary-600"
+                    >
+                      voir sur la carte <span aria-hidden="true">→</span>
+                    </a>
                   </div>
                 </div>
                 <div className="relative overflow-hidden rounded-[22px] shadow-md hover-card">
@@ -344,7 +360,7 @@ export default function HomePage() {
                     href="/eligibilite"
                     className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white"
                   >
-                    Démarrer ma consultation
+                    Démarrer une consultation fiscale
                   </Link>
                 </div>
               </Reveal>
@@ -364,7 +380,7 @@ export default function HomePage() {
                   href="/eligibilite"
                   className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-wide text-accent-darkBlue"
                 >
-                  Démarrer ma consultation
+                  Démarrer une consultation fiscale
                 </Link>
               </div>
             </Reveal>
