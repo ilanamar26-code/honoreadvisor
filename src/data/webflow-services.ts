@@ -8,8 +8,8 @@ export const webflowServiceItems = [
   {
     slug: "human-resources-consulting",
     href: "/services/human-resources-consulting",
-    title: "Création de société aux Emirats",
-    description: "Création de société aux Emirats avec la structuration adaptée à votre situation personnelle."
+    title: "Création de société et obtention de visa aux Emirats",
+    description: "Création de société aux Emirats avec structuration, immatriculation et visas liés au projet."
   },
   {
     slug: "exit-tax",
@@ -18,10 +18,10 @@ export const webflowServiceItems = [
     description: "Gérons ensemble la déclaration d'Exit tax auprès de l'administration fiscale."
   },
   {
-    slug: "visa-residence",
-    href: "/services/visa-residence",
-    title: "Obtention des visas de résidence",
-    description: "Obtention des visa pour les Emirats Arabes Unis."
+    slug: "testament-difc",
+    href: "/services/testament-difc",
+    title: "Obtention d'un testament auprès de DIFC",
+    description: "Rédaction et enregistrement d'un testament conforme aux standards DIFC."
   },
   {
     slug: "regime-fiscal-des-impatries",
@@ -164,9 +164,9 @@ export const webflowServiceDetails: Record<
     description: "Gérons ensemble la déclaration d'Exit tax auprès de l'administration fiscale.",
     bodyHtml: `<h2>L&#x27;Exit Tax en bref </h2><p>L&#x27;Exit Tax est un sujet crucial pour les candidats à l&#x27;expatriation qui envisagent de quitter le pays. </p><p>L&#x27;Exit Tax est une obligation fiscale appliquée lorsque vous transférez votre résidence fiscale hors de France. Cela signifie que si vous décidez de quitter le pays, vous pourriez être assujettis à cette obligation déclarative spécifique appelée &quot;Exit Tax&quot;.</p><p><strong>Dans l&#x27;entière majorité des cas, l&#x27;Exit Tax est une simple déclaration qui permet de notifier à l&#x27;administration fiscale le départ de France</strong> et permet de figer le montant des plus-value lattentes sur la detention des part ou actions de sociétés dont vous êtes propriétaire. </p><p>En effet, pour éviter de payer l&#x27;exit Tax lors du départ de france, il est nécessaire de demander à l&#x27;administration fiscale un sursis de paiement sur les plus-values latentes qui sera très souvent degrevé au terme du délai d&#x27;Exit Tax qui est de 2 ans ou 5 ans dépendaient de la valeur des parts au jour du transfert.</p><p>Il est donc essentiel de comprendre les règles et les procédures liées à l&#x27;Exit Tax pour éviter des surprises fiscales désagréables.</p><h2>Qui est concerné par l&#x27;Exit Tax ?</h2><p>L&#x27;Exit Tax s&#x27;applique aux résidents de France ayant décidé de transferer leur domicile à l&#x27;étranger qui detiennent des droits sociaux ou titres de sociétés atteignant une valeur globale d’au moins 800.000€ ou représentant au moins 50 % des bénéfices sociaux d’une société.</p><p>Si vous êtes assujettis à l&#x27;Exit Tax, la déclaration d&#x27;Exit Tax doit être transmise à l&#x27;administration fiscale au plus tard 90 jours avant votre départ de france.</p><h3><strong>Le cabinet Honoré Patrimoine vous assiste pour prendre en charge toute la procédure d’Exit Tax :</strong></h3><ul role="list"><li>Déterminer le périmètre d’assujettissement à l’Exit Tax</li><li>Etablir la déclaration initiale d’Exit Tax</li><li>Demander l’application du sursis d’imposition à l&#x27;administration fiscale</li><li>Constituer les garanties nécessaires à l’application du sursis</li><li>Intervenir en tant que représentant fiscal</li><li>Etablir les déclarations de suivi d’Exit Tax</li><li>Réclamer le dégrèvement de l’Exit Tax</li></ul>`
   },
-  "visa-residence": {
-    title: "Obtention des visas de résidence",
-    description: "Obtention des visa pour les Emirats Arabes Unis.",
-    bodyHtml: `<h2>Simplification des procédures d&#x27;obtention</h2><p>L&#x27;obtention d&#x27;un Visa de Résidence aux Émirats Arabes Unis est une étape essentielle pour les expatriés. Que vous soyez un investisseur immobilier, un employé ou un entrepreneur, le cabinet Honoré Advisor vous guide à travers les procédures simplifiées pour l&#x27;obtention de votre visa, pour vous et votre famille.</p><p>Les Émirats Arabes Unis ont simplifié les procédures d&#x27;obtention de visas de résidence pour attirer des talents et des investisseurs du monde entier.</p><p>Les fiscalistes du cabinet vous assistent pour obtenir votre visa rapidement et efficacement.</p><h2>Options de visas adaptées à vos besoins</h2><p>Que vous souhaitiez travailler, investir, ou vous établir aux Émirats, il existe une variété d&#x27;options de visas de résidence adaptées à vos besoins. Nous vous aidons à choisir le type de visa qui correspond le mieux à votre situation et à vos objectifs.</p><h3><strong>Notre intervention en bref :</strong></h3><ul role="list"><li>Évaluation personnalisée de votre situation pour déterminer le visa approprié.</li><li>Assistance complète dans la préparation de votre demande de visa.</li><li>Conseils sur les avantages fiscaux liés à la résidence aux Émirats.</li><li>Suivi pour garantir la conformité légale de votre statut de résidence.</li></ul>`
+  "testament-difc": {
+    title: "Obtention d'un testament auprès de DIFC",
+    description: "Rédaction et enregistrement d'un testament conforme aux standards DIFC.",
+    bodyHtml: `<h2>Sécuriser la transmission de vos actifs aux Émirats</h2><p>La mise en place d&#x27;un testament enregistré auprès du DIFC permet de sécuriser la transmission de vos actifs situés aux Émirats arabes unis dans un cadre juridique reconnu.</p><p>Cette démarche vise à éviter les zones d&#x27;incertitude et à assurer une exécution conforme à vos volontés, en tenant compte de votre situation familiale et patrimoniale.</p><h2>Un cadre structuré, conforme et opposable</h2><p>Le DIFC propose un cadre légal clair, avec des procédures d&#x27;enregistrement et de mise à jour adaptées aux expatriés. Nous vous accompagnons pour préparer les éléments nécessaires, structurer le testament et sécuriser l&#x27;enregistrement.</p><h3><strong>Notre intervention en bref :</strong></h3><ul role="list"><li>Analyse de votre situation familiale et patrimoniale</li><li>Préparation et structuration du testament DIFC</li><li>Accompagnement sur les formalités d&#x27;enregistrement</li><li>Suivi et mise à jour en cas d&#x27;évolution de situation</li></ul>`
   },
 };

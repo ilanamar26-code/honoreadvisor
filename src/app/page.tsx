@@ -15,14 +15,14 @@ const services = [
     href: "/services/exit-tax"
   },
   {
-    title: "Création de société aux Emirats",
-    description: "Structuration et immatriculation adaptées à votre situation.",
+    title: "Création de société et obtention de visa aux Emirats",
+    description: "Structuration, immatriculation et visas liés au projet.",
     href: "/services/human-resources-consulting"
   },
   {
-    title: "Obtention des visas de résidence",
-    description: "Accompagnement complet pour visas et conformité locale.",
-    href: "/services/visa-residence"
+    title: "Obtention d'un testament auprès de DIFC",
+    description: "Rédaction et enregistrement pour sécuriser la transmission.",
+    href: "/services/testament-difc"
   }
 ];
 
