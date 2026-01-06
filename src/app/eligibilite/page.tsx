@@ -736,6 +736,120 @@ const buildReferenceId = () => {
   return `HA-${date}-${rand}`;
 };
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const renderMemoBlock = (text: string, withBullets = false) => {
+  if (!text.trim()) return "";
+  if (!withBullets) {
+    return text
+      .split("\n\n")
+      .map((paragraph) => `<p style="margin:0 0 10px;">${escapeHtml(paragraph)}</p>`)
+      .join("");
+  }
+  const lines = text.split("\n");
+  const paragraphs: string[] = [];
+  const bullets: string[] = [];
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed.startsWith("•")) {
+      bullets.push(trimmed.replace(/^•\s*/, ""));
+    } else {
+      paragraphs.push(trimmed);
+    }
+  });
+  const paragraphHtml = paragraphs
+    .map((paragraph) => `<p style="margin:0 0 10px;">${escapeHtml(paragraph)}</p>`)
+    .join("");
+  const bulletHtml = bullets.length
+    ? `<ul style="margin:0 0 10px; padding-left:18px;">${bullets
+        .map((bullet) => `<li style="margin:0 0 6px;">${escapeHtml(bullet)}</li>`)
+        .join("")}</ul>`
+    : "";
+  return `${paragraphHtml}${bulletHtml}`;
+};
+
+const buildMemoEmailHtml = (memo: Memo, answers: Answers) => {
+  const fullName =
+    `${(answers.firstName as string) ?? ""} ${(answers.lastName as string) ?? ""}`.trim() ||
+    "Client Honoré Advisor";
+  const phone = (answers.phone as string) ?? "";
+  const email = (answers.email as string) ?? "";
+  const date = new Intl.DateTimeFormat("fr-FR").format(new Date());
+  const issueParts = memo.issues.split("\n\n");
+  const situationText = `${issueParts[0]?.replace("Résumé de situation : ", "") ?? ""}`.trim();
+  const analysisText = issueParts.slice(1).join("\n\n").trim();
+  const expatSupport =
+    "Préparer une expatriation fiscalement sécurisée vers les Émirats suppose une approche rigoureuse, une parfaite maîtrise des critères de résidence fiscale et une connaissance opérationnelle des pratiques de l’administration fiscale française.\nDans ce contexte, le cabinet Honoré intervient de manière permanente sur des dossiers d’expatriation vers les Émirats.\nCette expérience, acquise au travers de plusieurs centaines de situations d’expatriation traitées, combinée à une présence opérationnelle à la fois en France et aux Émirats arabes unis, permet d’aborder ces dossiers avec une vision globale, pragmatique et conforme aux exigences des deux administrations fiscales.";
+  const supportText =
+    answers.intent === "Je prépare une expatriation aux Émirats"
+      ? expatSupport
+      : `${memo.need}\n\n${memo.conclusion}`.trim();
+
+  return `<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Synthèse fiscale préliminaire</title>
+  </head>
+  <body style="margin:0; padding:0; background:#f6f7fb; font-family:Arial, Helvetica, sans-serif; color:#1a1f36;">
+    <div style="max-width:680px; margin:0 auto; padding:24px;">
+      <div style="background:#ffffff; border-radius:18px; padding:24px; border:1px solid #e4e8ff;">
+        <p style="margin:0 0 6px; font-size:12px; color:#4c5bd4; text-transform:uppercase; letter-spacing:.08em;">
+          Objet : Synthèse fiscale préliminaire
+        </p>
+        <p style="margin:0 0 16px; font-size:13px; color:#5b647b; font-style:italic;">
+          Cette synthèse fiscale préliminaire a pour unique objet de vous présenter les principaux enjeux fiscaux de votre projet,
+          en attirant votre attention sur les points de vigilance indispensables afin de réussir et sécuriser fiscalement votre expatriation vers les Émirats arabes unis.
+        </p>
+        <table style="width:100%; margin-bottom:16px; font-size:12px; color:#5b647b;">
+          <tr>
+            <td style="padding:2px 0;"><strong style="color:#1a1f36;">${escapeHtml(fullName)}</strong></td>
+            <td style="padding:2px 0; text-align:right;">Date : ${escapeHtml(date)}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 0;">Téléphone : ${escapeHtml(phone || "-")}</td>
+            <td style="padding:2px 0; text-align:right;">Email : ${escapeHtml(email || "-")}</td>
+          </tr>
+        </table>
+
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:#4c5bd4;">
+            Votre situation
+          </h3>
+          ${renderMemoBlock(situationText)}
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:#4c5bd4;">
+            Analyse fiscale préliminaire
+          </h3>
+          ${renderMemoBlock(analysisText, true)}
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:#4c5bd4;">
+            Accompagnement recommandé
+          </h3>
+          ${renderMemoBlock(supportText)}
+        </div>
+
+        <p style="margin:16px 0 0; font-size:11px; color:#6b7280;">
+          Signature : Roy Masliah – Fiscaliste<br/>
+          Cabinet Honoré Patrimoine
+        </p>
+      </div>
+    </div>
+  </body>
+</html>`;
+};
+
 export default function EligibilitePage() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -854,7 +968,8 @@ export default function EligibilitePage() {
     const score = scoreAnswer(answers);
     const proposals = buildProposal(answers);
     const proposalText = proposals.join(" | ");
-    const payload = { ref, score, answers, proposals };
+    const memoHtml = memo ? buildMemoEmailHtml(memo, answers) : "";
+    const payload = { ref, score, answers, proposals, memoHtml };
 
     try {
       await fetch("/api/eligibilite", {

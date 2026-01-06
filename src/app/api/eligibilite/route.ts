@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 type Answers = Record<string, string | string[]>;
 
@@ -16,12 +20,160 @@ const buildNotes = (answers: Answers, proposals: string[]) => {
 const normalizeDomain = (domain: string) =>
   domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
+const stripHtml = (value: string) =>
+  value
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{2,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+
+const wrapText = (text: string, font: any, size: number, maxWidth: number) => {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  words.forEach((word) => {
+    const candidate = current ? `${current} ${word}` : word;
+    const width = font.widthOfTextAtSize(candidate, size);
+    if (width <= maxWidth) {
+      current = candidate;
+      return;
+    }
+    if (current) lines.push(current);
+    current = word;
+  });
+  if (current) lines.push(current);
+  return lines;
+};
+
+const buildMemoPdf = async (memoHtml: string, answers: Answers) => {
+  const fullName = `${(answers.firstName as string) ?? ""} ${(answers.lastName as string) ?? ""}`.trim() ||
+    "Client Honoré Advisor";
+  const date = new Intl.DateTimeFormat("fr-FR").format(new Date());
+  const rawText = stripHtml(memoHtml);
+  const contentLines = rawText.split("\n").filter(Boolean);
+
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  let page = pdfDoc.addPage();
+  const { width, height } = page.getSize();
+  const margin = 48;
+  const maxWidth = width - margin * 2;
+  let y = height - margin;
+
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    const logoBytes = await readFile(logoPath);
+    const logoImage = await pdfDoc.embedPng(logoBytes);
+    const logoDims = logoImage.scale(1);
+    const maxLogoWidth = 180;
+    const scale = Math.min(maxLogoWidth / logoDims.width, 1);
+    const logoWidth = logoDims.width * scale;
+    const logoHeight = logoDims.height * scale;
+    page.drawImage(logoImage, {
+      x: width - margin - logoWidth,
+      y: height - margin - logoHeight + 6,
+      width: logoWidth,
+      height: logoHeight
+    });
+  } catch {
+    // Logo is optional; continue without it.
+  }
+
+  const title = "Synthèse fiscale préliminaire";
+  page.drawText(title, {
+    x: margin,
+    y,
+    size: 16,
+    font: boldFont,
+    color: rgb(0.1, 0.12, 0.22)
+  });
+  y -= 26;
+  page.drawText(`${fullName} — ${date}`, {
+    x: margin,
+    y,
+    size: 10,
+    font,
+    color: rgb(0.4, 0.43, 0.5)
+  });
+  y -= 20;
+
+  contentLines.forEach((line) => {
+    const wrapped = wrapText(line, font, 11, maxWidth);
+    wrapped.forEach((wrappedLine) => {
+      if (y < margin + 40) {
+        page = pdfDoc.addPage();
+        y = height - margin;
+      }
+      page.drawText(wrappedLine, {
+        x: margin,
+        y,
+        size: 11,
+        font,
+        color: rgb(0.15, 0.16, 0.2)
+      });
+      y -= 16;
+    });
+    y -= 6;
+  });
+
+  return Buffer.from(await pdfDoc.save());
+};
+
+const sendMemoEmail = async (to: string, memoHtml: string, answers: Answers) => {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT ?? "465");
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const from = process.env.SMTP_FROM ?? user;
+
+  if (!host || !user || !pass || !from || !to || !memoHtml) return;
+
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass }
+  });
+
+  const subject = "Synthèse préliminaire fiscale – Votre demande Honoré Advisor";
+  const text =
+    "Bonjour,\n\nVous trouverez ci-joint la synthèse préliminaire fiscale de votre dossier, établie suite aux éléments que vous avez renseignés lors de votre demande en ligne.\n\nUn de nos fiscalistes prendra contact avec vous dans les plus brefs délais afin d’échanger sur votre situation et d’approfondir les points identifiés.\nCordialement,\nL'équipe Honoré Advisor";
+  const html =
+    "<p>Bonjour,</p><p>Vous trouverez ci-joint la synthèse préliminaire fiscale de votre dossier, établie suite aux éléments que vous avez renseignés lors de votre demande en ligne.</p><p>Un de nos fiscalistes prendra contact avec vous dans les plus brefs délais afin d’échanger sur votre situation et d’approfondir les points identifiés.</p><p>Cordialement,<br/>L'équipe Honoré Advisor</p>";
+  const pdfBuffer = await buildMemoPdf(memoHtml, answers);
+  const filenameBase =
+    `${(answers.firstName as string) ?? ""} ${(answers.lastName as string) ?? ""}`.trim() ||
+    "Honore-Advisor";
+
+  await transporter.sendMail({
+    from,
+    to,
+    subject,
+    text,
+    html,
+    attachments: [
+      {
+        filename: `Synthese-${filenameBase.replace(/\s+/g, "-")}.pdf`,
+        content: pdfBuffer,
+        contentType: "application/pdf"
+      }
+    ]
+  });
+};
+
 export async function POST(req: Request) {
   const body = await req.json();
   console.log("[eligibilite]", body);
 
   const token = process.env.PIPEDRIVE_API_TOKEN;
   const domain = process.env.PIPEDRIVE_DOMAIN;
+  let emailSent = false;
 
   if (token && domain) {
     const baseUrl = `https://${normalizeDomain(domain)}/api/v1`;
@@ -54,6 +206,7 @@ export async function POST(req: Request) {
       const email = (answers.email as string) ?? "";
       const phone = (answers.phone as string) ?? "";
       const phoneValue = phone;
+      const memoHtml = (body?.memoHtml as string) ?? "";
 
       const personRes = await fetch(`${baseUrl}/persons?api_token=${token}`, {
         method: "POST",
@@ -89,8 +242,23 @@ export async function POST(req: Request) {
           person_id: personId
         })
       });
+
+      try {
+        await sendMemoEmail(email, memoHtml, answers);
+        emailSent = true;
+      } catch (error) {
+        console.error("[eligibilite][email]", error);
+      }
     } catch (error) {
       console.error("[eligibilite][pipedrive]", error);
+    }
+  }
+
+  if (!emailSent && body?.memoHtml && body?.answers?.email) {
+    try {
+      await sendMemoEmail(body.answers.email, body.memoHtml, body.answers);
+    } catch (error) {
+      console.error("[eligibilite][email]", error);
     }
   }
 
