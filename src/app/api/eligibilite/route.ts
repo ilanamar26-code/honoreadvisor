@@ -76,11 +76,12 @@ const buildMemoPdf = async (memoHtml: string, answers: Answers) => {
     const logoWidth = logoDims.width * scale;
     const logoHeight = logoDims.height * scale;
     page.drawImage(logoImage, {
-      x: width - margin - logoWidth,
+      x: margin,
       y: height - margin - logoHeight + 6,
       width: logoWidth,
       height: logoHeight
     });
+    y = height - margin - logoHeight - 18;
   } catch {
     // Logo is optional; continue without it.
   }
@@ -103,8 +104,18 @@ const buildMemoPdf = async (memoHtml: string, answers: Answers) => {
   });
   y -= 20;
 
+  const boldHeadings = new Set([
+    "Objet : Synthèse fiscale préliminaire",
+    "Votre situation",
+    "Analyse fiscale préliminaire",
+    "Accompagnement recommandé"
+  ]);
+
   contentLines.forEach((line) => {
-    const wrapped = wrapText(line, font, 11, maxWidth);
+    const isHeading = boldHeadings.has(line.trim());
+    const textFont = isHeading ? boldFont : font;
+    const textSize = isHeading ? 12 : 11;
+    const wrapped = wrapText(line, textFont, textSize, maxWidth);
     wrapped.forEach((wrappedLine) => {
       if (y < margin + 40) {
         page = pdfDoc.addPage();
@@ -113,8 +124,8 @@ const buildMemoPdf = async (memoHtml: string, answers: Answers) => {
       page.drawText(wrappedLine, {
         x: margin,
         y,
-        size: 11,
-        font,
+        size: textSize,
+        font: textFont,
         color: rgb(0.15, 0.16, 0.2)
       });
       y -= 16;
