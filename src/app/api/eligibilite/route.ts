@@ -66,25 +66,7 @@ const buildMemoPdf = async (memoHtml: string, answers: Answers) => {
   const maxWidth = width - margin * 2;
   let y = height - margin;
 
-  try {
-    const logoPath = path.join(process.cwd(), "public", "logo.png");
-    const logoBytes = await readFile(logoPath);
-    const logoImage = await pdfDoc.embedPng(logoBytes);
-    const logoDims = logoImage.scale(1);
-    const maxLogoWidth = 180;
-    const scale = Math.min(maxLogoWidth / logoDims.width, 1);
-    const logoWidth = logoDims.width * scale;
-    const logoHeight = logoDims.height * scale;
-    page.drawImage(logoImage, {
-      x: margin,
-      y: height - margin - logoHeight + 6,
-      width: logoWidth,
-      height: logoHeight
-    });
-    y = height - margin - logoHeight - 18;
-  } catch {
-    // Logo is optional; continue without it.
-  }
+  // Logo removed per request.
 
   const title = "Synthèse fiscale préliminaire";
   page.drawText(title, {
