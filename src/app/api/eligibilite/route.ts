@@ -165,6 +165,7 @@ const sendMemoEmail = async (to: string, memoHtml: string, answers: Answers) => 
       }
     ]
   });
+  console.log("[eligibilite][email] sent", { to, subject });
 };
 
 export async function POST(req: Request) {
