@@ -133,7 +133,7 @@ export default function AboutPage() {
             <p>RCS Dubai - License Number : 8678</p>
             <p>Téléphone : +971 50 245 2842</p>
             <p>Mail : contact@honoreadvisor.com</p>
-            <p>Tous droits réservés. 2024 - Honoré Advisor - Fiscaliste Dubaï - www.honoreadvisor.com © 2024</p>
+            <p>Tous droits réservés. 2026 - Honoré Advisor - Fiscaliste Dubaï - www.honoreadvisor.com © 2026</p>
           </div>
 
         </section>

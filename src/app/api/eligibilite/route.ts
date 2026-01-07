@@ -138,8 +138,15 @@ const sendMemoEmail = async (to: string, memoHtml: string, answers: Answers) => 
   const text =
     "Bonjour,\n\nVous trouverez ci-joint la synthèse préliminaire fiscale de votre dossier, établie suite aux éléments que vous avez renseignés lors de votre demande en ligne.\n\nUn de nos fiscalistes prendra contact avec vous dans les plus brefs délais afin d’échanger sur votre situation et d’approfondir les points identifiés.\nCordialement,\nL'équipe Honoré Advisor";
   const html =
-    "<p>Bonjour,</p><p>Vous trouverez ci-joint la synthèse préliminaire fiscale de votre dossier, établie suite aux éléments que vous avez renseignés lors de votre demande en ligne.</p><p>Un de nos fiscalistes prendra contact avec vous dans les plus brefs délais afin d’échanger sur votre situation et d’approfondir les points identifiés.</p><p>Cordialement,<br/>L'équipe Honoré Advisor</p>";
+    "<p>Bonjour,</p><p>Vous trouverez ci-joint la synthèse préliminaire fiscale de votre dossier, établie suite aux éléments que vous avez renseignés lors de votre demande en ligne.</p><p>Un de nos fiscalistes prendra contact avec vous dans les plus brefs délais afin d’échanger sur votre situation et d’approfondir les points identifiés.</p><p>Cordialement,</p><p><img src=\"cid:honore-logo\" alt=\"Honoré Advisor\" style=\"height:36px; width:auto; display:block; margin-bottom:6px;\"/>L'équipe Honoré Advisor<br/>Office de Dubai : Al Fattan Downtown, Dubaï, Emirats Arabe Unis<br/>Office de Paris : 54 avenue Marceau,75008 Paris, France</p>";
   const pdfBuffer = await buildMemoPdf(memoHtml, answers);
+  let logoBuffer: Buffer | null = null;
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    logoBuffer = await readFile(logoPath);
+  } catch {
+    logoBuffer = null;
+  }
   const filenameBase =
     `${(answers.firstName as string) ?? ""} ${(answers.lastName as string) ?? ""}`.trim() ||
     "Honore-Advisor";
@@ -155,7 +162,17 @@ const sendMemoEmail = async (to: string, memoHtml: string, answers: Answers) => 
         filename: `Synthese-${filenameBase.replace(/\s+/g, "-")}.pdf`,
         content: pdfBuffer,
         contentType: "application/pdf"
-      }
+      },
+      ...(logoBuffer
+        ? [
+            {
+              filename: "logo.png",
+              content: logoBuffer,
+              contentType: "image/png",
+              cid: "honore-logo"
+            }
+          ]
+        : [])
     ]
   });
   console.log("[eligibilite][email] sent", { to, subject });

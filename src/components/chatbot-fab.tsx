@@ -13,8 +13,9 @@ export function ChatbotFab() {
         onClick={() => trackEvent("click_cta_eligibilite")}
         className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-lg"
       >
-        <CalendarCheck className="h-4 w-4" />
-        Démarrer une consultation fiscale
+        <CalendarCheck className="hidden h-4 w-4 md:block" />
+        <span className="text-lg md:hidden" aria-hidden="true">📅</span>
+        <span className="hidden md:inline">Démarrer une consultation fiscale</span>
       </a>
       <a
         aria-label="WhatsApp (question rapide)"
@@ -24,8 +25,9 @@ export function ChatbotFab() {
         onClick={() => trackEvent("click_whatsapp")}
         className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-primary-700 shadow-sm"
       >
-        <MessageCircle className="h-4 w-4" />
-        WhatsApp (question rapide)
+        <MessageCircle className="hidden h-4 w-4 md:block" />
+        <span className="text-lg md:hidden" aria-hidden="true">💬</span>
+        <span className="hidden md:inline">WhatsApp (question rapide)</span>
       </a>
     </div>
   );

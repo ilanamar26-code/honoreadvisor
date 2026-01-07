@@ -18,9 +18,21 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Honoré Advisor | Cabinet fiscal premium France–Émirats",
+  title: "Honoré Advisor | Cabinet Fiscal de référence entre la France et les Emirats",
   description:
-    "Cabinet premium de structuration fiscale et expatriation UAE. Présence à Dubaï, filiale d'Honoré Patrimoine France."
+    "Votre fiscaliste à Dubai, expatriation, Exit Tax, Créations de société à Dubai, Résidence fiscal",
+  openGraph: {
+    title: "Honoré Advisor | Cabinet Fiscal de référence entre la France et les Emirats",
+    description:
+      "Votre fiscaliste à Dubai, expatriation, Exit Tax, Créations de société à Dubai, Résidence fiscal",
+    images: ["/logo-mark.png"]
+  },
+  twitter: {
+    title: "Honoré Advisor | Cabinet Fiscal de référence entre la France et les Emirats",
+    description:
+      "Votre fiscaliste à Dubai, expatriation, Exit Tax, Créations de société à Dubai, Résidence fiscal",
+    images: ["/logo-mark.png"]
+  }
 };
 
 export default function RootLayout({
