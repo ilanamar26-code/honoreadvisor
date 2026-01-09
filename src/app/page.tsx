@@ -127,8 +127,8 @@ export default function HomePage() {
   return (
     <div className="bg-aurora">
       <div className="bg-grid">
-        <header className="relative overflow-hidden">
-          <div className="mx-auto max-w-6xl px-6 py-8 lg:py-12">
+        <header className="relative overflow-hidden pb-16">
+          <div className="mx-auto max-w-6xl px-6 pb-8 pt-12 lg:pb-12 lg:pt-16">
             <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <Reveal className="space-y-6 lg:-mt-6" delay={0}>
                 <span className="hero-pill">Cabinet francophone à Dubaï</span>
@@ -139,17 +139,14 @@ export default function HomePage() {
                   Honoré Advisor accompagne expatriés, non-résidents et impatriés dans leur fiscalité
                   entre Paris et Dubaï.
                 </p>
-                <p className="text-sm text-muted">
-                  Présence opérationnelle à Dubaï depuis +5 ans.
-                </p>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 -mt-2">
                   {["Expatriation", "Exit Tax", "Résidence fiscale"].map((item) => (
                     <span key={item} className="hero-tag">
                       {item}
                     </span>
                   ))}
                 </div>
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4 -mt-2">
                   <Link
                     href="/eligibilite"
                     className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-glow button-sheen"
@@ -159,7 +156,7 @@ export default function HomePage() {
                   </Link>
                 </div>
               </Reveal>
-              <Reveal className="grid gap-4" delay={120}>
+              <Reveal className="grid gap-3 lg:-mt-6" delay={120}>
                 <div className="relative overflow-hidden rounded-[28px] shadow-lg hover-card">
                   <Image
                     src="/images/consultation.jpg"
@@ -173,58 +170,46 @@ export default function HomePage() {
                     Consultation stratégique
                   </div>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="relative overflow-hidden rounded-[22px] shadow-md hover-card">
-                    <Image
-                      src="/images/dubai.jpg"
-                      alt="Dubaï"
-                      width={520}
-                      height={420}
-                      className="h-52 w-full object-cover object-center"
-                    />
-                    <div className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold text-accent-darkBlue">
-                      Basé à Paris et à Dubai
+                <div className="neo-card p-3">
+                  <div className="grid gap-2 divide-y divide-primary-100/60">
+                    <div className="pt-0">
+                      <p className="text-xs font-semibold uppercase text-primary-600">
+                        Présence opérationnelle
+                      </p>
+                      <p className="mt-1 text-xs text-muted">
+                        À Dubaï depuis +5 ans.
+                      </p>
                     </div>
-                  </div>
-                  <div className="neo-card">
-                    <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Dubai</p>
-                    <p className="mt-2 text-sm text-muted">
-                      Al Fattan Downton, Dubai
-                    </p>
-                    <a
-                      href="https://maps.app.goo.gl/fbyVKcPXPaSJgzki7"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2 inline-flex items-center gap-2 text-xs text-primary-600"
-                    >
-                      voir sur la carte <span aria-hidden="true">→</span>
-                    </a>
-                    <p className="mt-4 text-xs font-semibold uppercase text-primary-600">
-                      Bureau de Paris
-                    </p>
-                    <p className="mt-1 text-sm text-muted">
-                      54 avenue Marceau 75008 Paris
-                    </p>
-                    <a
-                      href="https://maps.app.goo.gl/z7VFQTSuK9F9GR917"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2 inline-flex items-center gap-2 text-xs text-primary-600"
-                    >
-                      voir sur la carte <span aria-hidden="true">→</span>
-                    </a>
-                  </div>
-                </div>
-                <div className="relative overflow-hidden rounded-[22px] shadow-md hover-card">
-                  <Image
-                    src="/images/paris.jpg"
-                    alt="Paris"
-                    width={720}
-                    height={420}
-                    className="h-32 w-full object-cover"
-                  />
-                  <div className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold text-accent-darkBlue">
-                    Expérience internationale
+                    <div className="pt-3">
+                      <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Dubai</p>
+                      <p className="mt-1 text-xs text-muted">
+                        Adresse : Al Fattan Downton, Dubai
+                      </p>
+                      <a
+                        href="https://maps.app.goo.gl/fbyVKcPXPaSJgzki7"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-flex items-center gap-2 text-[11px] text-primary-600"
+                      >
+                        voir sur la carte <span aria-hidden="true">→</span>
+                      </a>
+                    </div>
+                    <div className="pt-3">
+                      <p className="text-xs font-semibold uppercase text-primary-600">
+                        Bureau de Paris
+                      </p>
+                      <p className="mt-1 text-xs text-muted">
+                        Adresse : 54 avenue Marceau 75008 Paris
+                      </p>
+                      <a
+                        href="https://maps.app.goo.gl/z7VFQTSuK9F9GR917"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-flex items-center gap-2 text-[11px] text-primary-600"
+                      >
+                        voir sur la carte <span aria-hidden="true">→</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </Reveal>
@@ -233,12 +218,12 @@ export default function HomePage() {
         </header>
 
         <main>
-          <section className="mx-auto max-w-6xl px-6 pb-16">
-            <Reveal className="stat-strip grid gap-4 sm:grid-cols-3" delay={0}>
+          <section className="mx-auto max-w-6xl px-6 pb-12 pt-6 -mt-28">
+            <Reveal className="grid gap-3 sm:grid-cols-3" delay={0}>
               {stats.map((stat) => (
-                <div key={stat.label} className="stat-card">
+                <div key={stat.label} className="stat-card flex h-full items-baseline gap-2">
                   <p className="text-2xl font-semibold text-accent-darkBlue">{stat.value}</p>
-                  <p className="mt-2 text-sm text-muted">{stat.label}</p>
+                  <p className="text-sm text-muted">{stat.label}</p>
                 </div>
               ))}
             </Reveal>
