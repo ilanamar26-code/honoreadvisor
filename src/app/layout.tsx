@@ -27,6 +27,9 @@ export const metadata: Metadata = {
       "Votre fiscaliste à Dubai, expatriation, Exit Tax, Créations de société à Dubai, Résidence fiscal",
     images: ["/logo-mark.png"]
   },
+  icons: {
+    icon: "/logo-mark.png"
+  },
   twitter: {
     title: "Honoré Advisor | Cabinet Fiscal de référence entre la France et les Emirats",
     description:
