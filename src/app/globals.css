@@ -531,7 +531,8 @@ main {
 }
 
 .portrait-frame-tall {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 5;
+  max-height: 320px;
 }
 
 .about-grid {

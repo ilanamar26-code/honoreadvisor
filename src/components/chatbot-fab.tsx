@@ -1,31 +1,41 @@
 "use client";
 
 import { CalendarCheck, MessageCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
 
 export function ChatbotFab() {
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith("/en") ? "/en" : "";
+  const isEnglish = Boolean(basePath);
+  const eligibilityHref = basePath ? `${basePath}/eligibilite` : "/eligibilite";
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
       <a
-        aria-label="Démarrer une consultation fiscale"
-        href="/eligibilite"
+        aria-label={isEnglish ? "Start a tax consultation" : "Démarrer une consultation fiscale"}
+        href={eligibilityHref}
         onClick={() => trackEvent("click_cta_eligibilite")}
         className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-white shadow-lg"
       >
         <span className="text-lg" aria-hidden="true">📅</span>
-        <span className="sr-only">Démarrer une consultation fiscale</span>
+        <span className="sr-only">
+          {isEnglish ? "Start a tax consultation" : "Démarrer une consultation fiscale"}
+        </span>
       </a>
       <a
-        aria-label="WhatsApp (question rapide)"
+        aria-label={isEnglish ? "WhatsApp (quick question)" : "WhatsApp (question rapide)"}
         href={buildWhatsAppLink()}
         target="_blank"
         rel="noreferrer"
         onClick={() => trackEvent("click_whatsapp")}
-        className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-primary-700 shadow-sm"
+        className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg ring-1 ring-black/5 transition hover:scale-105"
       >
-        <span className="text-lg" aria-hidden="true">💬</span>
-        <span className="sr-only">WhatsApp (question rapide)</span>
+        <MessageCircle className="h-5 w-5" aria-hidden="true" />
+        <span className="sr-only">
+          {isEnglish ? "WhatsApp (quick question)" : "WhatsApp (question rapide)"}
+        </span>
       </a>
     </div>
   );

@@ -24,8 +24,8 @@ export default function AboutPage() {
               </h2>
             </Reveal>
             <div className="mt-8 grid gap-6 lg:grid-cols-2">
-              <Reveal className="portrait-card" delay={80}>
-                <div className="portrait-frame portrait-frame-tall">
+              <Reveal className="portrait-card lg:grid-cols-[0.9fr_1.1fr] lg:items-center" delay={80}>
+                <div className="portrait-frame portrait-frame-tall bg-white">
                   <img
                     src="/images/roy-masliah.jpg"
                     alt="Roy Masliah"
@@ -43,7 +43,7 @@ export default function AboutPage() {
                   </p>
                 </div>
               </Reveal>
-              <Reveal className="portrait-card" delay={120}>
+              <Reveal className="portrait-card lg:grid-cols-[0.9fr_1.1fr] lg:items-center" delay={120}>
                 <div className="portrait-frame portrait-frame-tall">
                   <img
                     src="/images/ilan-amar.jpg"

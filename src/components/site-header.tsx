@@ -3,50 +3,78 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { Menu, X } from "lucide-react";
 
-const navLinks = [
+const navLinksFr = [
   { label: "Services", href: "/services" },
   { label: "Méthode", href: "/methode" },
   { label: "À propos", href: "/a-propos" }
 ];
 
+const navLinksEn = [
+  { label: "Services", href: "/services" },
+  { label: "Method", href: "/methode" },
+  { label: "About", href: "/a-propos" }
+];
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const basePath = pathname?.startsWith("/en") ? "/en" : "";
+  const isEnglish = Boolean(basePath);
+  const withBasePath = (href: string) => {
+    if (!basePath) {
+      return href;
+    }
+    if (href === "/") {
+      return basePath;
+    }
+    if (href === basePath || href.startsWith(`${basePath}/`)) {
+      return href;
+    }
+    return `${basePath}${href}`;
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-primary-100/60 bg-white/70 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href={withBasePath("/")} className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary-100 bg-white shadow-sm">
             <Image src="/logo-mark.png" alt="Honoré Advisor" width={36} height={36} className="h-9 w-9" priority />
           </span>
           <div className="leading-tight">
             <p className="text-sm font-semibold text-accent-darkBlue">Honoré Advisor</p>
-            <p className="text-xs text-muted">Votre fiscaliste à Dubaï</p>
+            <p className="text-xs text-muted">
+              {isEnglish ? "Your tax advisor in Dubai" : "Votre fiscaliste à Dubaï"}
+            </p>
           </div>
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm font-semibold text-accent-darkBlue lg:flex">
-          {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="transition hover:text-primary-600">
+          {(isEnglish ? navLinksEn : navLinksFr).map((link) => (
+            <Link
+              key={link.href}
+              href={withBasePath(link.href)}
+              className="transition hover:text-primary-600"
+            >
               {link.label}
             </Link>
           ))}
           <Link
-            href="/eligibilite"
+            href={withBasePath("/eligibilite")}
             onClick={() => trackEvent("click_cta_eligibilite")}
             className="rounded-full bg-primary-600 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-white"
           >
-            Démarrer une consultation fiscale
+            {isEnglish ? "Start a tax consultation" : "Démarrer une consultation fiscale"}
           </Link>
         </nav>
 
         <button
           onClick={() => setOpen((prev) => !prev)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-primary-200 text-primary-700 lg:hidden"
-          aria-label="Ouvrir le menu"
+          aria-label={isEnglish ? "Open menu" : "Ouvrir le menu"}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -55,10 +83,10 @@ export function SiteHeader() {
       {open ? (
         <div className="border-t border-primary-100 bg-white/90 px-6 py-4 lg:hidden">
           <div className="flex flex-col gap-4 text-sm font-semibold text-accent-darkBlue">
-            {navLinks.map((link) => (
+            {(isEnglish ? navLinksEn : navLinksFr).map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={withBasePath(link.href)}
                 className="rounded-lg px-2 py-2 transition hover:bg-primary-50"
                 onClick={() => setOpen(false)}
               >
@@ -66,14 +94,14 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link
-              href="/eligibilite"
+              href={withBasePath("/eligibilite")}
               className="rounded-full bg-primary-600 px-4 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white"
               onClick={() => {
                 trackEvent("click_cta_eligibilite");
                 setOpen(false);
               }}
             >
-              Démarrer une consultation fiscale
+              {isEnglish ? "Start a tax consultation" : "Démarrer une consultation fiscale"}
             </Link>
           </div>
         </div>

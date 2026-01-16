@@ -51,6 +51,27 @@ const stats = [
   { value: "100+", label: "Avis positifs de nos clients" }
 ];
 
+const testimonials = [
+  {
+    name: "J. M.",
+    role: "Entrepreneur – Dubaï",
+    quote:
+      "On a enfin mis des mots clairs sur ma situation. Le diagnostic a été direct, sans jargon inutile."
+  },
+  {
+    name: "S. L.",
+    role: "Cadre dirigeant – Émirats",
+    quote:
+      "Très carré, très pro. J’ai compris exactement ce qui devait être sécurisé avant d’aller plus loin."
+  },
+  {
+    name: "A. R.",
+    role: "Investisseur – France",
+    quote:
+      "Le suivi est sérieux et concret. On sent qu’ils maîtrisent vraiment les dossiers France–Émirats."
+  }
+];
+
 const methodSteps = [
   {
     title: "Diagnostic",
@@ -159,53 +180,43 @@ export default function HomePage() {
               <Reveal className="grid gap-3 lg:-mt-6" delay={120}>
                 <div className="relative overflow-hidden rounded-[28px] shadow-lg hover-card">
                   <Image
-                    src="/images/consultation.jpg"
-                    alt="Consultation stratégique Honoré Advisor"
+                    src="/images/france-uae-flags.jpg"
+                    alt="Drapeaux France et Émirats"
                     width={900}
                     height={620}
                     className="h-64 w-full object-cover"
                     priority
                   />
                   <div className="absolute bottom-4 left-4 rounded-2xl bg-white/90 px-4 py-2 text-xs font-semibold text-accent-darkBlue shadow-sm">
-                    Consultation stratégique
+                    France • Émirats
                   </div>
                 </div>
-                <div className="neo-card p-3">
-                  <div className="grid gap-2 divide-y divide-primary-100/60">
-                    <div className="pt-0">
-                      <p className="text-xs font-semibold uppercase text-primary-600">
-                        Présence opérationnelle
-                      </p>
-                      <p className="mt-1 text-xs text-muted">
-                        À Dubaï depuis +5 ans.
-                      </p>
-                    </div>
-                    <div className="pt-3">
+                <div className="neo-card p-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
                       <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Dubai</p>
-                      <p className="mt-1 text-xs text-muted">
-                        Adresse : Al Fattan Downton, Dubai
+                      <p className="mt-2 text-xs text-muted">
+                        Al Fattan Downton, Dubai
                       </p>
                       <a
                         href="https://maps.app.goo.gl/fbyVKcPXPaSJgzki7"
                         target="_blank"
                         rel="noreferrer"
-                        className="mt-1 inline-flex items-center gap-2 text-[11px] text-primary-600"
+                        className="mt-2 inline-flex items-center gap-2 text-[11px] text-primary-600"
                       >
                         voir sur la carte <span aria-hidden="true">→</span>
                       </a>
                     </div>
-                    <div className="pt-3">
-                      <p className="text-xs font-semibold uppercase text-primary-600">
-                        Bureau de Paris
-                      </p>
-                      <p className="mt-1 text-xs text-muted">
-                        Adresse : 54 avenue Marceau 75008 Paris
+                    <div>
+                      <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Paris</p>
+                      <p className="mt-2 text-xs text-muted">
+                        54 avenue Marceau 75008 Paris
                       </p>
                       <a
                         href="https://maps.app.goo.gl/z7VFQTSuK9F9GR917"
                         target="_blank"
                         rel="noreferrer"
-                        className="mt-1 inline-flex items-center gap-2 text-[11px] text-primary-600"
+                        className="mt-2 inline-flex items-center gap-2 text-[11px] text-primary-600"
                       >
                         voir sur la carte <span aria-hidden="true">→</span>
                       </a>
@@ -228,8 +239,6 @@ export default function HomePage() {
               ))}
             </Reveal>
           </section>
-
-
 
           <section className="mx-auto max-w-6xl px-6 pb-16">
             <Reveal delay={0}>
@@ -306,6 +315,30 @@ export default function HomePage() {
                     En savoir plus
                     <ArrowRight className="h-4 w-4" />
                   </Link>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+
+          <section className="mx-auto max-w-6xl px-6 pb-16">
+            <Reveal delay={0}>
+              <h2 className="section-title text-3xl font-semibold text-accent-darkBlue">
+                Avis clients
+              </h2>
+            </Reveal>
+            <div className="mt-8 grid gap-6 lg:grid-cols-3">
+              {testimonials.map((item, index) => (
+                <Reveal key={item.name} className="glass rounded-3xl p-6" delay={60 + index * 60}>
+                  <p className="text-sm text-muted">“{item.quote}”</p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-100 bg-white text-sm font-semibold text-primary-600">
+                      {item.name}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-accent-darkBlue">{item.name}</p>
+                      <p className="text-xs text-muted">{item.role}</p>
+                    </div>
+                  </div>
                 </Reveal>
               ))}
             </div>
