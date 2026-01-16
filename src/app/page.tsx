@@ -194,7 +194,7 @@ export default function HomePage() {
                 <div className="neo-card p-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Dubai</p>
+                      <p className="text-xs font-semibold uppercase text-primary-600">Cabinet de Dubai</p>
                       <p className="mt-2 text-xs text-muted">
                         Al Fattan Downton, Dubai
                       </p>
@@ -208,7 +208,7 @@ export default function HomePage() {
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase text-primary-600">Bureau de Paris</p>
+                      <p className="text-xs font-semibold uppercase text-primary-600">Cabinet de Paris</p>
                       <p className="mt-2 text-xs text-muted">
                         54 avenue Marceau 75008 Paris
                       </p>
