@@ -1,6 +1,5 @@
 "use client";
 
-import { CalendarCheck, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/analytics";
@@ -32,7 +31,18 @@ export function ChatbotFab() {
         onClick={() => trackEvent("click_whatsapp")}
         className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg ring-1 ring-black/5 transition hover:scale-105"
       >
-        <MessageCircle className="h-5 w-5" aria-hidden="true" />
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+        </svg>
         <span className="sr-only">
           {isEnglish ? "WhatsApp (quick question)" : "WhatsApp (question rapide)"}
         </span>

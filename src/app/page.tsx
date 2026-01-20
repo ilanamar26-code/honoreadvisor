@@ -178,25 +178,31 @@ export default function HomePage() {
                 </div>
               </Reveal>
               <Reveal className="grid gap-3 lg:-mt-6" delay={120}>
-                <div className="relative overflow-hidden rounded-[28px] shadow-lg hover-card">
-                  <Image
-                    src="/images/france-uae-flags.jpg"
-                    alt="Drapeaux France et Émirats"
-                    width={900}
-                    height={620}
-                    className="h-64 w-full object-cover"
-                    priority
-                  />
-                  <div className="absolute bottom-4 left-4 rounded-2xl bg-white/90 px-4 py-2 text-xs font-semibold text-accent-darkBlue shadow-sm">
-                    France • Émirats
+                <div className="portrait-card hero-portrait-card w-full">
+                  <div className="portrait-frame portrait-frame-tall hero-portrait-frame">
+                    <Image
+                      src="/images/roy-bureau-parisien.png"
+                      alt="Roy Masliah, cabinet parisien"
+                      width={720}
+                      height={900}
+                      className="portrait-image hero-portrait-image"
+                      priority
+                    />
+                    <div className="hero-portrait-meta">
+                      <p className="text-xs font-semibold uppercase text-primary-600">Roy Masliah</p>
+                      <p className="text-sm text-accent-darkBlue">Fondateur, Fiscaliste international</p>
+                      <p className="text-xs text-muted">Honoré Advisor</p>
+                    </div>
                   </div>
                 </div>
                 <div className="neo-card p-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <p className="text-xs font-semibold uppercase text-primary-600">Cabinet de Dubai</p>
+                      <p className="text-xs font-semibold uppercase text-primary-600">
+                        Cabinet à <span className="text-accent-darkBlue">Dubai</span>
+                      </p>
                       <p className="mt-2 text-xs text-muted">
-                        Al Fattan Downton, Dubai
+                        Al Fattan Downton, <span className="font-semibold text-accent-darkBlue">Dubai</span>
                       </p>
                       <a
                         href="https://maps.app.goo.gl/fbyVKcPXPaSJgzki7"
@@ -208,9 +214,11 @@ export default function HomePage() {
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase text-primary-600">Cabinet de Paris</p>
+                      <p className="text-xs font-semibold uppercase text-primary-600">
+                        Cabinet à <span className="text-accent-darkBlue">Paris</span>
+                      </p>
                       <p className="mt-2 text-xs text-muted">
-                        54 avenue Marceau 75008 Paris
+                        54 avenue Marceau 75008 <span className="font-semibold text-accent-darkBlue">Paris</span>
                       </p>
                       <a
                         href="https://maps.app.goo.gl/z7VFQTSuK9F9GR917"
@@ -348,8 +356,8 @@ export default function HomePage() {
             <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               <Reveal className="relative h-full min-h-[360px] overflow-hidden rounded-[28px] shadow-lg" delay={0}>
                 <Image
-                  src="/images/paris.jpg"
-                  alt="Paris et Dubaï"
+                  src="/images/imagefremirati.png"
+                  alt="France et Emirats"
                   width={860}
                   height={620}
                   className="h-full w-full object-cover"

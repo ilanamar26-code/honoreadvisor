@@ -157,17 +157,21 @@ export default function HomePage() {
                 </div>
               </Reveal>
               <Reveal className="grid gap-3 lg:-mt-6" delay={120}>
-                <div className="relative overflow-hidden rounded-[28px] shadow-lg hover-card">
-                  <Image
-                    src="/images/consultation.jpg"
-                    alt="Honoré Advisor strategic consultation"
-                    width={900}
-                    height={620}
-                    className="h-64 w-full object-cover"
-                    priority
-                  />
-                  <div className="absolute bottom-4 left-4 rounded-2xl bg-white/90 px-4 py-2 text-xs font-semibold text-accent-darkBlue shadow-sm">
-                    Strategic consultation
+                <div className="portrait-card hero-portrait-card w-full">
+                  <div className="portrait-frame portrait-frame-tall hero-portrait-frame">
+                    <Image
+                      src="/images/roy-bureau-parisien.png"
+                      alt="Roy Masliah, Paris office"
+                      width={720}
+                      height={900}
+                      className="portrait-image hero-portrait-image"
+                      priority
+                    />
+                    <div className="hero-portrait-meta">
+                      <p className="text-xs font-semibold uppercase text-primary-600">Roy Masliah</p>
+                      <p className="text-sm text-accent-darkBlue">Founder, International tax advisor</p>
+                      <p className="text-xs text-muted">Honoré Advisor</p>
+                    </div>
                   </div>
                 </div>
                 <div className="neo-card p-3">
