@@ -11,7 +11,10 @@ export async function POST(req: Request) {
   // Ralentit les essais en série.
   await new Promise((r) => setTimeout(r, 600));
 
-  if (!token || !expectedPassword || !safeEqual(password, expectedPassword)) {
+  if (!token || !expectedPassword) {
+    return NextResponse.redirect(`${origin}/pilotage/login?erreur=config`, { status: 303 });
+  }
+  if (!safeEqual(password, expectedPassword)) {
     return NextResponse.redirect(`${origin}/pilotage/login?erreur=1`, { status: 303 });
   }
 

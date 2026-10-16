@@ -20,7 +20,11 @@ export default function PilotageLogin({ searchParams }: { searchParams: { erreur
           autoComplete="current-password"
           className="rounded-lg border border-black/15 bg-transparent px-3 py-2 dark:border-white/20"
         />
-        {searchParams.erreur ? <p className="text-sm text-red-600">Mot de passe incorrect.</p> : null}
+        {searchParams.erreur === "config" ? (
+          <p className="text-sm text-red-600">Accès non configuré sur ce déploiement : PILOTAGE_PASSWORD ou PILOTAGE_SECRET est absent.</p>
+        ) : searchParams.erreur ? (
+          <p className="text-sm text-red-600">Mot de passe incorrect.</p>
+        ) : null}
         <button type="submit" className="mt-2 rounded-lg bg-[#1a1f36] px-4 py-2 font-medium text-white">
           Entrer
         </button>
